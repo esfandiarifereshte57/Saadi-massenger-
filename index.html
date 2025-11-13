@@ -670,6 +670,77 @@
         .avatar-bot {
             background: #ff6b6b;
         }
+        
+        /* مودال‌ها */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        
+        .modal-content {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        
+        .modal-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-btn.secondary {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
@@ -781,7 +852,7 @@
             <!-- صفحه تنظیمات -->
             <div class="settings-container hidden" id="settings-container">
                 <div class="settings-section">
-                    <div class="settings-item">
+                    <div class="settings-item" id="profile-settings">
                         <div class="settings-icon">
                             <i class="fas fa-user"></i>
                         </div>
@@ -793,7 +864,7 @@
                             <i class="fas fa-chevron-left"></i>
                         </div>
                     </div>
-                    <div class="settings-item">
+                    <div class="settings-item" id="privacy-settings">
                         <div class="settings-icon">
                             <i class="fas fa-lock"></i>
                         </div>
@@ -808,7 +879,7 @@
                 </div>
                 
                 <div class="settings-section">
-                    <div class="settings-item">
+                    <div class="settings-item" id="theme-settings">
                         <div class="settings-icon">
                             <i class="fas fa-moon"></i>
                         </div>
@@ -820,7 +891,7 @@
                             <i class="fas fa-chevron-left"></i>
                         </div>
                     </div>
-                    <div class="settings-item">
+                    <div class="settings-item" id="notification-settings">
                         <div class="settings-icon">
                             <i class="fas fa-bell"></i>
                         </div>
@@ -835,7 +906,7 @@
                 </div>
                 
                 <div class="settings-section">
-                    <div class="settings-item">
+                    <div class="settings-item" id="help-settings">
                         <div class="settings-icon">
                             <i class="fas fa-question-circle"></i>
                         </div>
@@ -847,7 +918,7 @@
                             <i class="fas fa-chevron-left"></i>
                         </div>
                     </div>
-                    <div class="settings-item">
+                    <div class="settings-item" id="logout-settings">
                         <div class="settings-icon">
                             <i class="fas fa-sign-out-alt"></i>
                         </div>
@@ -865,8 +936,8 @@
             <!-- صفحه ایجاد چت جدید -->
             <div class="new-chat-container hidden" id="new-chat-container">
                 <input type="text" class="search-box" placeholder="جستجو در مخاطبین...">
-                <div class="contact-list">
-                    <div class="contact-item">
+                <div class="contact-list" id="contact-list">
+                    <div class="contact-item" data-userid="@user1">
                         <div class="chat-avatar avatar-user">
                             <i class="fas fa-user"></i>
                             <div class="online-status"></div>
@@ -879,7 +950,29 @@
                             <div class="chat-last-message">آخرین وضعیت: آنلاین</div>
                         </div>
                     </div>
-                    <!-- لیست مخاطبین -->
+                    <div class="contact-item" data-userid="@user2">
+                        <div class="chat-avatar avatar-user">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">
+                                دوست خوبم
+                            </div>
+                            <div class="chat-last-message">آفلاین</div>
+                        </div>
+                    </div>
+                    <div class="contact-item" data-userid="@group1">
+                        <div class="chat-avatar avatar-group">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">
+                                گروه خانواده
+                                <i class="fas fa-check-circle verified-badge"></i>
+                            </div>
+                            <div class="chat-last-message">5 عضو</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -913,12 +1006,55 @@
         </div>
     </div>
 
+    <!-- مودال‌ها -->
+    <div class="modal hidden" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ویرایش پروفایل</div>
+                <button class="modal-close" id="close-profile-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="auth-input" placeholder="نام کاربری" style="margin-bottom: 12px;">
+                <input type="text" class="auth-input" placeholder="بیوگرافی">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" id="cancel-profile">انصراف</button>
+                <button class="modal-btn primary" id="save-profile">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="logout-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">خروج از حساب</div>
+                <button class="modal-close" id="close-logout-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" id="cancel-logout">انصراف</button>
+                <button class="modal-btn primary" id="confirm-logout">خروج</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // داده‌های نمونه
         let currentUser = null;
         let currentChat = null;
         let chats = [];
         let messages = {};
+        let contacts = [
+            { id: 1, name: 'کاربر نمونه', userid: '@user1', online: true, verified: true, type: 'user' },
+            { id: 2, name: 'دوست خوبم', userid: '@user2', online: false, verified: false, type: 'user' },
+            { id: 3, name: 'گروه خانواده', userid: '@group1', online: true, verified: true, type: 'group' }
+        ];
 
         // المان‌های DOM
         const elements = {
@@ -933,7 +1069,10 @@
             messagesContainer: document.getElementById('messages-container'),
             settingsContainer: document.getElementById('settings-container'),
             newChatContainer: document.getElementById('new-chat-container'),
-            mainContent: document.getElementById('main-content')
+            mainContent: document.getElementById('main-content'),
+            contactList: document.getElementById('contact-list'),
+            profileModal: document.getElementById('profile-modal'),
+            logoutModal: document.getElementById('logout-modal')
         };
 
         // مقداردهی اولیه
@@ -972,6 +1111,34 @@
             
             // رویداد جستجو
             document.getElementById('search-btn').addEventListener('click', showSearch);
+            
+            // رویدادهای تنظیمات
+            document.getElementById('profile-settings').addEventListener('click', () => showModal('profile-modal'));
+            document.getElementById('privacy-settings').addEventListener('click', () => showMessage('صفحه حریم خصوصی به زودی اضافه خواهد شد', 'info'));
+            document.getElementById('theme-settings').addEventListener('click', toggleTheme);
+            document.getElementById('notification-settings').addEventListener('click', () => showMessage('تنظیمات اعلان‌ها به زودی اضافه خواهد شد', 'info'));
+            document.getElementById('help-settings').addEventListener('click', () => showMessage('راهنما به زودی اضافه خواهد شد', 'info'));
+            document.getElementById('logout-settings').addEventListener('click', () => showModal('logout-modal'));
+            
+            // رویدادهای مودال‌ها
+            document.getElementById('close-profile-modal').addEventListener('click', () => hideModal('profile-modal'));
+            document.getElementById('cancel-profile').addEventListener('click', () => hideModal('profile-modal'));
+            document.getElementById('save-profile').addEventListener('click', saveProfile);
+            
+            document.getElementById('close-logout-modal').addEventListener('click', () => hideModal('logout-modal'));
+            document.getElementById('cancel-logout').addEventListener('click', () => hideModal('logout-modal'));
+            document.getElementById('confirm-logout').addEventListener('click', logout);
+            
+            // رویداد مخاطبین
+            document.querySelectorAll('.contact-item').forEach(contact => {
+                contact.addEventListener('click', (e) => {
+                    const userid = e.currentTarget.getAttribute('data-userid');
+                    startNewChat(userid);
+                });
+            });
+            
+            // رویداد جستجو در مخاطبین
+            document.querySelector('.search-box').addEventListener('input', filterContacts);
         }
 
         // نمایش صفحه ورود
@@ -1010,6 +1177,11 @@
                 elements.authMessage.textContent = '';
                 elements.authMessage.className = 'auth-message';
             }, 3000);
+        }
+        
+        // نمایش پیام در برنامه
+        function showMessage(message, type = 'info') {
+            alert(message); // در نسخه واقعی می‌توانید از یک سیستم اعلان بهتر استفاده کنید
         }
 
         // ورود به سیستم
@@ -1223,6 +1395,19 @@
             
             elements.messagesContainer.innerHTML = '';
             
+            if (messages[chatId].length === 0) {
+                elements.messagesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div>هنوز پیامی ارسال نشده</div>
+                        <div style="font-size: 14px; margin-top: 8px;">اولین پیام را ارسال کنید!</div>
+                    </div>
+                `;
+                return;
+            }
+            
             messages[chatId].forEach(message => {
                 const messageElement = document.createElement('div');
                 messageElement.className = `message ${message.sent ? 'message-sent' : 'message-received'}`;
@@ -1269,6 +1454,12 @@
             
             // پاک کردن فیلد ورودی
             input.value = '';
+            
+            // حذف حالت خالی
+            const emptyState = elements.messagesContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
             
             // اسکرول به پایین
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
@@ -1322,7 +1513,107 @@
         // نمایش صفحه جستجو
         function showSearch() {
             // این تابع می‌تواند برای نمایش صفحه جستجو توسعه یابد
-            alert('قابلیت جستجو به زودی اضافه خواهد شد');
+            showMessage('قابلیت جستجو به زودی اضافه خواهد شد');
+        }
+        
+        // شروع چت جدید
+        function startNewChat(userid) {
+            const contact = contacts.find(c => c.userid === userid);
+            if (!contact) return;
+            
+            // ایجاد چت جدید
+            const newChat = {
+                id: Date.now(),
+                name: contact.name,
+                lastMessage: 'شروع چت',
+                time: 'اکنون',
+                unread: 0,
+                type: contact.type,
+                online: contact.online,
+                verified: contact.verified
+            };
+            
+            // اضافه کردن به لیست چت‌ها
+            chats.unshift(newChat);
+            
+            // بازگشت به لیست چت‌ها
+            elements.newChatContainer.classList.add('hidden');
+            elements.chatsList.classList.remove('hidden');
+            document.getElementById('header-title').textContent = 'چت‌ها';
+            
+            // بارگذاری مجدد لیست چت‌ها
+            loadChats();
+            
+            // باز کردن چت جدید
+            openChat(newChat);
+        }
+        
+        // فیلتر مخاطبین
+        function filterContacts(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const contactItems = document.querySelectorAll('.contact-item');
+            
+            contactItems.forEach(item => {
+                const name = item.querySelector('.chat-name').textContent.toLowerCase();
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // نمایش مودال
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+        
+        // پنهان کردن مودال
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+        
+        // ذخیره پروفایل
+        function saveProfile() {
+            showMessage('پروفایل با موفقیت به‌روزرسانی شد', 'success');
+            hideModal('profile-modal');
+        }
+        
+        // تغییر تم
+        function toggleTheme() {
+            const isDark = document.body.style.getPropertyValue('--background-color') === '#111b21';
+            
+            if (isDark) {
+                // تغییر به تم روشن
+                document.body.style.setProperty('--background-color', '#f0f2f5');
+                document.body.style.setProperty('--secondary-color', '#ffffff');
+                document.body.style.setProperty('--text-primary', '#111b21');
+                document.body.style.setProperty('--text-secondary', '#667781');
+                document.body.style.setProperty('--message-sent', '#d9fdd3');
+                document.body.style.setProperty('--message-received', '#ffffff');
+                document.body.style.setProperty('--border-color', '#e9edef');
+                
+                showMessage('تم روز فعال شد', 'success');
+            } else {
+                // تغییر به تم تاریک
+                document.body.style.setProperty('--background-color', '#111b21');
+                document.body.style.setProperty('--secondary-color', '#202c33');
+                document.body.style.setProperty('--text-primary', '#e9edef');
+                document.body.style.setProperty('--text-secondary', '#8696a0');
+                document.body.style.setProperty('--message-sent', '#005c4b');
+                document.body.style.setProperty('--message-received', '#202c33');
+                document.body.style.setProperty('--border-color', '#2a3942');
+                
+                showMessage('تم شب فعال شد', 'success');
+            }
+        }
+        
+        // خروج از حساب
+        function logout() {
+            currentUser = null;
+            currentChat = null;
+            hideModal('logout-modal');
+            showAuthScreen();
         }
 
         // راه‌اندازی برنامه
