@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>پیامرسان سعدی | Saadi Messenger</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Reset و تنظیمات پایه */
         * {
@@ -13,10 +14,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --primary-color: #00a884;
+            --secondary-color: #202c33;
+            --background-color: #111b21;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --message-sent: #005c4b;
+            --message-received: #202c33;
+            --border-color: #2a3942;
+        }
+
         body {
             font-family: 'Vazir', 'Tahoma', sans-serif;
-            background: #111b21;
-            color: #e9edef;
+            background: var(--background-color);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
             position: fixed;
@@ -48,10 +60,11 @@
             color: white;
         }
 
-        .splash-logo {
+        .splash-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
             animation: pulse 2s infinite;
+            color: white;
         }
 
         .splash-title {
@@ -77,7 +90,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #111b21;
+            background: var(--background-color);
             display: flex;
             flex-direction: column;
         }
@@ -85,12 +98,13 @@
         .auth-header {
             padding: 3rem 2rem 2rem;
             text-align: center;
-            background: linear-gradient(135deg, #00a884 0%, #06a06b 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #06a06b 100%);
         }
 
-        .auth-logo {
+        .auth-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
+            color: white;
         }
 
         .auth-title {
@@ -114,7 +128,7 @@
 
         .auth-tabs {
             display: flex;
-            background: #2a3942;
+            background: var(--border-color);
             border-radius: 12px;
             padding: 4px;
             margin-bottom: 1rem;
@@ -125,7 +139,7 @@
             padding: 12px;
             border: none;
             background: transparent;
-            color: #8696a0;
+            color: var(--text-secondary);
             font-family: inherit;
             font-size: 14px;
             border-radius: 8px;
@@ -133,30 +147,30 @@
         }
 
         .auth-tab.active {
-            background: #00a884;
+            background: var(--primary-color);
             color: white;
         }
 
         .auth-input {
             width: 100%;
             padding: 16px;
-            background: #2a3942;
+            background: var(--border-color);
             border: none;
             border-radius: 12px;
-            color: white;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 16px;
             outline: none;
         }
 
         .auth-input::placeholder {
-            color: #8696a0;
+            color: var(--text-secondary);
         }
 
         .auth-button {
             width: 100%;
             padding: 16px;
-            background: #00a884;
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 12px;
@@ -168,7 +182,7 @@
         }
 
         .auth-button:disabled {
-            background: #8696a0;
+            background: var(--text-secondary);
             cursor: not-allowed;
         }
 
@@ -182,7 +196,7 @@
 
         .auth-message.success {
             background: rgba(0, 168, 132, 0.2);
-            color: #00a884;
+            color: var(--primary-color);
         }
 
         .auth-message.error {
@@ -199,17 +213,17 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: #111b21;
+            background: var(--background-color);
         }
 
         /* هدر */
         .header {
-            background: #202c33;
+            background: var(--secondary-color);
             padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #2a3942;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header-title {
@@ -225,10 +239,20 @@
         .header-btn {
             background: none;
             border: none;
-            color: #8696a0;
-            font-size: 20px;
+            color: var(--text-secondary);
+            font-size: 18px;
             cursor: pointer;
             padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .header-btn:active {
+            background: var(--border-color);
         }
 
         /* تب‌بار پایین */
@@ -237,9 +261,9 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #202c33;
+            background: var(--secondary-color);
             display: flex;
-            border-top: 1px solid #2a3942;
+            border-top: 1px solid var(--border-color);
             padding: 8px 0;
         }
 
@@ -250,14 +274,14 @@
             align-items: center;
             background: none;
             border: none;
-            color: #8696a0;
+            color: var(--text-secondary);
             font-size: 12px;
             cursor: pointer;
             padding: 8px 0;
         }
 
         .tab-item.active {
-            color: #00a884;
+            color: var(--primary-color);
         }
 
         .tab-icon {
@@ -281,27 +305,31 @@
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            border-bottom: 1px solid #2a3942;
+            border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .chat-item:active {
-            background: #2a3942;
+            background: var(--border-color);
         }
 
         .chat-avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: #00a884;
+            background: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             color: white;
-            font-weight: bold;
             margin-left: 12px;
+            position: relative;
+        }
+
+        .chat-avatar i {
+            font-size: 22px;
         }
 
         .chat-info {
@@ -312,11 +340,19 @@
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-badge {
+            color: #1da1f2;
+            font-size: 14px;
         }
 
         .chat-last-message {
             font-size: 14px;
-            color: #8696a0;
+            color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -329,12 +365,12 @@
 
         .chat-time {
             font-size: 12px;
-            color: #8696a0;
+            color: var(--text-secondary);
             margin-bottom: 4px;
         }
 
         .chat-unread {
-            background: #00a884;
+            background: var(--primary-color);
             color: white;
             font-size: 12px;
             padding: 2px 6px;
@@ -349,7 +385,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #111b21;
+            background: var(--background-color);
             display: flex;
             flex-direction: column;
         }
@@ -379,13 +415,13 @@
 
         .message-sent {
             align-self: flex-end;
-            background: #005c4b;
+            background: var(--message-sent);
             border-radius: 8px 8px 0 8px;
         }
 
         .message-received {
             align-self: flex-start;
-            background: #202c33;
+            background: var(--message-received);
             border-radius: 8px 8px 8px 0;
         }
 
@@ -396,27 +432,27 @@
 
         .message-time {
             font-size: 11px;
-            color: #8696a0;
+            color: var(--text-secondary);
             text-align: left;
             margin-top: 4px;
         }
 
         .input-container {
-            background: #202c33;
+            background: var(--secondary-color);
             padding: 12px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
-            border-top: 1px solid #2a3942;
+            border-top: 1px solid var(--border-color);
         }
 
         .message-input {
             flex: 1;
             padding: 12px 16px;
-            background: #2a3942;
+            background: var(--border-color);
             border: none;
             border-radius: 20px;
-            color: white;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 14px;
             outline: none;
@@ -425,11 +461,11 @@
         }
 
         .message-input::placeholder {
-            color: #8696a0;
+            color: var(--text-secondary);
         }
 
         .send-button {
-            background: #00a884;
+            background: var(--primary-color);
             color: white;
             border: none;
             width: 40px;
@@ -439,11 +475,11 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .send-button:disabled {
-            background: #8696a0;
+            background: var(--text-secondary);
             cursor: not-allowed;
         }
 
@@ -453,7 +489,7 @@
         }
 
         .settings-section {
-            background: #202c33;
+            background: var(--secondary-color);
             border-radius: 12px;
             margin-bottom: 16px;
             overflow: hidden;
@@ -461,10 +497,9 @@
 
         .settings-item {
             padding: 16px;
-            border-bottom: 1px solid #2a3942;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            justify-content: between;
             cursor: pointer;
         }
 
@@ -473,7 +508,7 @@
         }
 
         .settings-item:active {
-            background: #2a3942;
+            background: var(--border-color);
         }
 
         .settings-icon {
@@ -481,6 +516,7 @@
             margin-left: 12px;
             width: 24px;
             text-align: center;
+            color: var(--text-secondary);
         }
 
         .settings-text {
@@ -495,11 +531,11 @@
 
         .settings-desc {
             font-size: 12px;
-            color: #8696a0;
+            color: var(--text-secondary);
         }
 
         .settings-arrow {
-            color: #8696a0;
+            color: var(--text-secondary);
             font-size: 16px;
         }
 
@@ -511,10 +547,10 @@
         .search-box {
             width: 100%;
             padding: 12px 16px;
-            background: #2a3942;
+            background: var(--border-color);
             border: none;
             border-radius: 12px;
-            color: white;
+            color: var(--text-primary);
             font-family: inherit;
             font-size: 14px;
             outline: none;
@@ -522,18 +558,18 @@
         }
 
         .search-box::placeholder {
-            color: #8696a0;
+            color: var(--text-secondary);
         }
 
         .contact-list {
-            background: #202c33;
+            background: var(--secondary-color);
             border-radius: 12px;
             overflow: hidden;
         }
 
         .contact-item {
             padding: 16px;
-            border-bottom: 1px solid #2a3942;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             cursor: pointer;
@@ -544,7 +580,7 @@
         }
 
         .contact-item:active {
-            background: #2a3942;
+            background: var(--border-color);
         }
 
         /* وضعیت‌های مختلف */
@@ -555,13 +591,14 @@
         .empty-state {
             text-align: center;
             padding: 3rem 2rem;
-            color: #8696a0;
+            color: var(--text-secondary);
         }
 
         .empty-state-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
             opacity: 0.5;
+            color: var(--text-secondary);
         }
 
         /* اسکرول بار سفارشی */
@@ -574,7 +611,7 @@
         }
 
         .messages-container::-webkit-scrollbar-thumb {
-            background: #2a3942;
+            background: var(--border-color);
             border-radius: 2px;
         }
 
@@ -604,13 +641,44 @@
                 padding: 8px 16px;
             }
         }
+
+        /* آیکون وضعیت آنلاین */
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border: 2px solid var(--background-color);
+            border-radius: 50%;
+        }
+
+        /* آواتارهای مختلف */
+        .avatar-user {
+            background: var(--primary-color);
+        }
+
+        .avatar-group {
+            background: #667eea;
+        }
+
+        .avatar-channel {
+            background: #0088cc;
+        }
+
+        .avatar-bot {
+            background: #ff6b6b;
+        }
     </style>
 </head>
 <body>
     <!-- صفحه اسپلش -->
     <div class="splash-screen" id="splash-screen">
         <div class="splash-content">
-            <div class="splash-logo">💬</div>
+            <div class="splash-icon">
+                <i class="fas fa-comments"></i>
+            </div>
             <div class="splash-title">پیامرسان سعدی</div>
             <div class="splash-subtitle">Saadi Messenger</div>
         </div>
@@ -619,7 +687,9 @@
     <!-- صفحه ورود -->
     <div class="auth-container hidden" id="auth-container">
         <div class="auth-header">
-            <div class="auth-logo">💬</div>
+            <div class="auth-icon">
+                <i class="fas fa-comments"></i>
+            </div>
             <div class="auth-title">پیامرسان سعدی</div>
             <div class="auth-subtitle">به پیامرسان امن و سریع خوش آمدید</div>
         </div>
@@ -654,8 +724,12 @@
         <div class="header">
             <div class="header-title" id="header-title">چت‌ها</div>
             <div class="header-actions">
-                <button class="header-btn" id="search-btn">🔍</button>
-                <button class="header-btn" id="menu-btn">⋮</button>
+                <button class="header-btn" id="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="header-btn" id="menu-btn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
             </div>
         </div>
 
@@ -664,7 +738,9 @@
             <!-- لیست چت‌ها -->
             <div class="chats-list" id="chats-list">
                 <div class="empty-state">
-                    <div class="empty-state-icon">💬</div>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
                     <div>هنوز چتی ندارید</div>
                     <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه + کلیک کنید</div>
                 </div>
@@ -673,16 +749,22 @@
             <!-- صفحه چت -->
             <div class="chat-container hidden" id="chat-container">
                 <div class="header">
-                    <button class="header-btn" id="back-btn">←</button>
+                    <button class="header-btn" id="back-btn">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                     <div class="header-title" id="chat-title">چت</div>
                     <div class="header-actions">
-                        <button class="header-btn" id="chat-menu-btn">⋮</button>
+                        <button class="header-btn" id="chat-menu-btn">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
                 
                 <div class="messages-container" id="messages-container">
                     <div class="empty-state">
-                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
                         <div>هنوز پیامی ارسال نشده</div>
                         <div style="font-size: 14px; margin-top: 8px;">اولین پیام را ارسال کنید!</div>
                     </div>
@@ -690,7 +772,9 @@
                 
                 <div class="input-container">
                     <input type="text" class="message-input" id="message-input" placeholder="پیام بنویسید...">
-                    <button class="send-button" id="send-btn">➤</button>
+                    <button class="send-button" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
 
@@ -698,58 +782,82 @@
             <div class="settings-container hidden" id="settings-container">
                 <div class="settings-section">
                     <div class="settings-item">
-                        <div class="settings-icon">👤</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">پروفایل</div>
                             <div class="settings-desc">مدیریت حساب کاربری</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                     <div class="settings-item">
-                        <div class="settings-icon">🔒</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">حریم خصوصی</div>
                             <div class="settings-desc">تنظیمات امنیتی</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="settings-section">
                     <div class="settings-item">
-                        <div class="settings-icon">🌙</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">تم شب</div>
                             <div class="settings-desc">فعال/غیرفعال</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                     <div class="settings-item">
-                        <div class="settings-icon">🔔</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">اعلان‌ها</div>
                             <div class="settings-desc">مدیریت نوتیفیکیشن‌ها</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="settings-section">
                     <div class="settings-item">
-                        <div class="settings-icon">❓</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">راهنما</div>
                             <div class="settings-desc">راهنمای استفاده</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                     <div class="settings-item">
-                        <div class="settings-icon">🚪</div>
+                        <div class="settings-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
                         <div class="settings-text">
                             <div class="settings-title">خروج</div>
                             <div class="settings-desc">خروج از حساب کاربری</div>
                         </div>
-                        <div class="settings-arrow">›</div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -759,9 +867,15 @@
                 <input type="text" class="search-box" placeholder="جستجو در مخاطبین...">
                 <div class="contact-list">
                     <div class="contact-item">
-                        <div class="chat-avatar">👤</div>
+                        <div class="chat-avatar avatar-user">
+                            <i class="fas fa-user"></i>
+                            <div class="online-status"></div>
+                        </div>
                         <div class="chat-info">
-                            <div class="chat-name">کاربر نمونه</div>
+                            <div class="chat-name">
+                                کاربر نمونه
+                                <i class="fas fa-check-circle verified-badge"></i>
+                            </div>
                             <div class="chat-last-message">آخرین وضعیت: آنلاین</div>
                         </div>
                     </div>
@@ -773,19 +887,27 @@
         <!-- تب‌بار پایین -->
         <div class="tab-bar">
             <button class="tab-item active" data-tab="chats">
-                <div class="tab-icon">💬</div>
+                <div class="tab-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
                 <div>چت‌ها</div>
             </button>
             <button class="tab-item" data-tab="status">
-                <div class="tab-icon">🔴</div>
+                <div class="tab-icon">
+                    <i class="fas fa-circle"></i>
+                </div>
                 <div>استاتوس</div>
             </button>
             <button class="tab-item" data-tab="calls">
-                <div class="tab-icon">📞</div>
+                <div class="tab-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
                 <div>تماس‌ها</div>
             </button>
             <button class="tab-item" data-tab="settings">
-                <div class="tab-icon">⚙️</div>
+                <div class="tab-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
                 <div>تنظیمات</div>
             </button>
         </div>
@@ -847,6 +969,9 @@
             
             // رویداد منو
             document.getElementById('menu-btn').addEventListener('click', showNewChat);
+            
+            // رویداد جستجو
+            document.getElementById('search-btn').addEventListener('click', showSearch);
         }
 
         // نمایش صفحه ورود
@@ -984,9 +1109,41 @@
         function loadChats() {
             // داده‌های نمونه
             chats = [
-                { id: 1, name: 'گروه خانواده', lastMessage: 'سلام به همه', time: '10:30', unread: 2, type: 'group' },
-                { id: 2, name: 'دوست خوبم', lastMessage: 'چطوری؟', time: '09:15', unread: 0, type: 'user' },
-                { id: 3, name: 'کانال اخبار', lastMessage: 'خبر فوری', time: 'دیروز', unread: 5, type: 'channel' }
+                { 
+                    id: 1, 
+                    name: 'گروه خانواده', 
+                    lastMessage: 'سلام به همه', 
+                    time: '10:30', 
+                    unread: 2, 
+                    type: 'group',
+                    verified: true
+                },
+                { 
+                    id: 2, 
+                    name: 'دوست خوبم', 
+                    lastMessage: 'چطوری؟', 
+                    time: '09:15', 
+                    unread: 0, 
+                    type: 'user',
+                    online: true
+                },
+                { 
+                    id: 3, 
+                    name: 'کانال اخبار', 
+                    lastMessage: 'خبر فوری', 
+                    time: 'دیروز', 
+                    unread: 5, 
+                    type: 'channel',
+                    verified: true
+                },
+                { 
+                    id: 4, 
+                    name: 'ربات پشتیبانی', 
+                    lastMessage: 'چطور می‌تونم کمک کنم؟', 
+                    time: '12:45', 
+                    unread: 0, 
+                    type: 'bot'
+                }
             ];
             
             elements.chatsList.innerHTML = '';
@@ -994,7 +1151,9 @@
             if (chats.length === 0) {
                 elements.chatsList.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
                         <div>هنوز چتی ندارید</div>
                         <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه + کلیک کنید</div>
                     </div>
@@ -1005,10 +1164,31 @@
             chats.forEach(chat => {
                 const chatElement = document.createElement('div');
                 chatElement.className = 'chat-item';
+                
+                let avatarClass = 'avatar-user';
+                let avatarIcon = 'fas fa-user';
+                
+                if (chat.type === 'group') {
+                    avatarClass = 'avatar-group';
+                    avatarIcon = 'fas fa-users';
+                } else if (chat.type === 'channel') {
+                    avatarClass = 'avatar-channel';
+                    avatarIcon = 'fas fa-bullhorn';
+                } else if (chat.type === 'bot') {
+                    avatarClass = 'avatar-bot';
+                    avatarIcon = 'fas fa-robot';
+                }
+                
                 chatElement.innerHTML = `
-                    <div class="chat-avatar">${getAvatarForChat(chat)}</div>
+                    <div class="chat-avatar ${avatarClass}">
+                        <i class="${avatarIcon}"></i>
+                        ${chat.online ? '<div class="online-status"></div>' : ''}
+                    </div>
                     <div class="chat-info">
-                        <div class="chat-name">${chat.name}</div>
+                        <div class="chat-name">
+                            ${chat.name}
+                            ${chat.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                        </div>
                         <div class="chat-last-message">${chat.lastMessage}</div>
                     </div>
                     <div class="chat-meta">
@@ -1020,15 +1200,6 @@
                 chatElement.addEventListener('click', () => openChat(chat));
                 elements.chatsList.appendChild(chatElement);
             });
-        }
-
-        // انتخاب آواتار مناسب برای چت
-        function getAvatarForChat(chat) {
-            switch(chat.type) {
-                case 'group': return '👥';
-                case 'channel': return '📢';
-                default: return '👤';
-            }
         }
 
         // باز کردن چت
@@ -1146,6 +1317,12 @@
             elements.chatsList.classList.add('hidden');
             elements.newChatContainer.classList.remove('hidden');
             document.getElementById('header-title').textContent = 'چت جدید';
+        }
+
+        // نمایش صفحه جستجو
+        function showSearch() {
+            // این تابع می‌تواند برای نمایش صفحه جستجو توسعه یابد
+            alert('قابلیت جستجو به زودی اضافه خواهد شد');
         }
 
         // راه‌اندازی برنامه
