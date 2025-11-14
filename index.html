@@ -6,51 +6,890 @@
     <title>پیامرسان سعدی | Saadi Messenger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* تمام استایل‌های قبلی حفظ شده‌اند */
-        /* فقط استایل‌های جدید اضافه شده‌اند */
-        
-        .saved-messages-badge {
-            background: var(--primary-color);
-            color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 8px;
-            margin-right: 5px;
+        /* Reset و تنظیمات پایه */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        .mention {
-            color: var(--primary-color);
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
+
+        :root {
+            --primary-color: #00a884;
+            --secondary-color: #202c33;
+            --background-color: #111b21;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --message-sent: #005c4b;
+            --message-received: #202c33;
+            --border-color: #2a3942;
+            --online-status: #4ade80;
+            --typing-indicator: #8696a0;
         }
-        
-        .mention:hover {
-            text-decoration: underline;
-        }
-        
-        .search-results {
-            background: var(--secondary-color);
-            border-radius: 12px;
-            margin-top: 10px;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            height: 100vh;
             overflow: hidden;
-            max-height: 300px;
+            position: fixed;
+            width: 100%;
+            user-select: none;
+        }
+
+        /* صفحه اسپلش */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .splash-content {
+            text-align: center;
+            color: white;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            border-radius: 28px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: logoPulse 2s infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .splash-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+        }
+
+        .splash-title {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .splash-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* صفحه ورود */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
         }
-        
-        .search-result-item {
+
+        .auth-header {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            background: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .auth-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .auth-logo img {
+            width: 85px;
+            height: 85px;
+            border-radius: 15px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .auth-form {
+            padding: 2.5rem 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-height: fit-content;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--border-color);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .auth-input:focus {
+            background: #2a3942;
+            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.3);
+        }
+
+        .auth-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-button:hover {
+            background: #06a06b;
+        }
+
+        .auth-button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .auth-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .auth-message.success {
+            background: rgba(0, 168, 132, 0.2);
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 168, 132, 0.3);
+        }
+
+        .auth-message.error {
+            background: rgba(233, 93, 93, 0.2);
+            color: #e95d5d;
+            border: 1px solid rgba(233, 93, 93, 0.3);
+        }
+
+        /* صفحه اصلی */
+        .messenger-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: var(--background-color);
+        }
+
+        /* هدر */
+        .header {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 19px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:active {
+            background: var(--border-color);
+        }
+
+        /* تب‌بار پایین */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--secondary-color);
+            display: flex;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            height: 60px;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 8px 0;
+            transition: all 0.2s ease;
+        }
+
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* محتوای اصلی */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 60px;
+        }
+
+        /* لیست چت‌ها */
+        .chats-list {
+            padding: 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
             padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             transition: background 0.2s;
+            position: relative;
         }
-        
-        .search-result-item:last-child {
+
+        .chat-item:active {
+            background: var(--border-color);
+        }
+
+        .chat-item.unread {
+            background: rgba(0, 168, 132, 0.05);
+        }
+
+        .chat-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-left: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar i {
+            font-size: 22px;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-badge {
+            color: #1da1f2;
+            font-size: 14px;
+        }
+
+        .chat-last-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-meta {
+            text-align: left;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .chat-unread {
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 18px;
+            font-weight: 500;
+        }
+
+        /* صفحه چت */
+        .chat-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .chat-header-info {
+            flex: 1;
+        }
+
+        .chat-with {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .chat-status {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .typing-indicator {
+            color: var(--primary-color);
+            font-style: italic;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
+            max-height: calc(100vh - 140px);
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            word-wrap: break-word;
+            animation: slideIn 0.2s ease;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-sent {
+            align-self: flex-end;
+            background: var(--message-sent);
+            border-radius: 7.5px 7.5px 0 7.5px;
+        }
+
+        .message-received {
+            align-self: flex-start;
+            background: var(--message-received);
+            border-radius: 7.5px 7.5px 7.5px 0;
+        }
+
+        .message-text {
+            font-size: 14.5px;
+            line-height: 1.4;
+            margin-bottom: 2px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: left;
+            opacity: 0.8;
+        }
+
+        .message-status {
+            position: absolute;
+            bottom: 6px;
+            left: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .message-sent .message-status {
+            color: #8696a0;
+        }
+
+        .input-container {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            min-height: 62px;
+        }
+
+        .message-input-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--border-color);
+            border-radius: 20px;
+            padding: 2px 5px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            max-height: 100px;
+            resize: none;
+            line-height: 1.4;
+        }
+
+        .message-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 5px;
+            padding: 0 5px;
+        }
+
+        .input-action {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .input-action:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .send-button:hover {
+            background: #06a06b;
+        }
+
+        .send-button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* صفحه تنظیمات */
+        .settings-container {
+            padding: 16px;
+        }
+
+        .settings-section {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .settings-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .settings-item:last-child {
             border-bottom: none;
         }
-        
-        .search-result-item:hover {
+
+        .settings-item:active {
             background: var(--border-color);
+        }
+
+        .settings-icon {
+            font-size: 20px;
+            margin-left: 12px;
+            width: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .settings-text {
+            flex: 1;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .settings-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .settings-arrow {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* صفحه ایجاد چت جدید */
+        .new-chat-container {
+            padding: 16px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .contact-list {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .contact-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-item:active {
+            background: var(--border-color);
+        }
+
+        /* وضعیت‌های مختلف */
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: var(--text-secondary);
+        }
+
+        /* اسکرول بار سفارشی */
+        .auth-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .auth-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .auth-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2.5px;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2.5px;
+        }
+
+        /* سازگاری با iOS */
+        @supports (-webkit-touch-callout: none) {
+            .messenger-container {
+                height: -webkit-fill-available;
+            }
+        }
+
+        /* حالت لنداسکیپ */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 8px 16px;
+            }
+            
+            .messages-container {
+                padding: 8px 16px;
+                max-height: calc(100vh - 120px);
+            }
+            
+            .input-container {
+                padding: 8px 16px;
+            }
+            
+            .auth-header {
+                padding: 2rem 2rem 1rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem 2rem;
+            }
+        }
+
+        /* آیکون وضعیت آنلاین */
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--online-status);
+            border: 2px solid var(--background-color);
+            border-radius: 50%;
+        }
+
+        /* آواتارهای مختلف */
+        .avatar-user {
+            background: var(--primary-color);
+        }
+
+        .avatar-group {
+            background: #667eea;
+        }
+
+        .avatar-channel {
+            background: #0088cc;
+        }
+
+        .avatar-bot {
+            background: #ff6b6b;
+        }
+        
+        /* منوی سه نقطه */
+        .menu-dropdown {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 100;
+            width: 200px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:active {
+            background: var(--border-color);
+        }
+
+        .menu-icon {
+            font-size: 18px;
+            color: var(--text-secondary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            color: var(--text-primary);
         }
     </style>
 </head>
@@ -155,12 +994,6 @@
                 </div>
                 <div class="menu-text">ایجاد کانال</div>
             </div>
-            <div class="menu-item" id="saved-messages-menu">
-                <div class="menu-icon">
-                    <i class="fas fa-bookmark"></i>
-                </div>
-                <div class="menu-text">پیام‌های ذخیره شده</div>
-            </div>
         </div>
 
         <!-- محتوای اصلی -->
@@ -245,59 +1078,161 @@
                 </div>
             </div>
 
-            <!-- صفحه پیام‌های ذخیره شده -->
-            <div class="saved-messages-container hidden" id="saved-messages-container">
-                <div class="chat-header">
-                    <button class="header-btn" id="back-from-saved-btn">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <div class="chat-avatar avatar-user" style="background: #ff6b6b;">
-                        <i class="fas fa-bookmark"></i>
-                    </div>
-                    <div class="chat-header-info">
-                        <div class="chat-with">
-                            پیام‌های ذخیره شده
+            <!-- صفحه تنظیمات -->
+            <div class="settings-container hidden" id="settings-container">
+                <div class="settings-section">
+                    <div class="settings-item" id="profile-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="chat-status">
-                            ذخیره شخصی پیام‌ها
+                        <div class="settings-text">
+                            <div class="settings-title">پروفایل</div>
+                            <div class="settings-desc">مدیریت حساب کاربری</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                    </div>
+                    <div class="settings-item" id="privacy-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="settings-text">
+                            <div class="settings-title">حریم خصوصی</div>
+                            <div class="settings-desc">تنظیمات امنیتی</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="messages-container" id="saved-messages-list">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-bookmark"></i>
+                <div class="settings-section">
+                    <div class="settings-item" id="theme-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-moon"></i>
                         </div>
-                        <div>هنوز پیامی ذخیره نکرده‌اید</div>
-                        <div style="font-size: 14px; margin-top: 8px;">برای ذخیره پیام، روی پیام مورد نظر کلیک کرده و "ذخیره" را انتخاب کنید</div>
+                        <div class="settings-text">
+                            <div class="settings-title">تم شب</div>
+                            <div class="settings-desc">فعال/غیرفعال</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                    </div>
+                    <div class="settings-item" id="notification-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="settings-text">
+                            <div class="settings-title">اعلان‌ها</div>
+                            <div class="settings-desc">مدیریت نوتیفیکیشن‌ها</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-item" id="help-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="settings-text">
+                            <div class="settings-title">راهنما</div>
+                            <div class="settings-desc">راهنمای استفاده</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                    </div>
+                    <div class="settings-item" id="logout-settings">
+                        <div class="settings-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="settings-text">
+                            <div class="settings-title">خروج</div>
+                            <div class="settings-desc">خروج از حساب کاربری</div>
+                        </div>
+                        <div class="settings-arrow">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- صفحه پروفایل -->
-            <div class="profile-container hidden" id="profile-container">
-                <!-- محتوای صفحه پروفایل بدون تغییر -->
-            </div>
-
-            <!-- صفحه تنظیمات -->
-            <div class="settings-container hidden" id="settings-container">
-                <!-- محتوای صفحه تنظیمات بدون تغییر -->
-            </div>
-
             <!-- صفحه ایجاد چت جدید -->
             <div class="new-chat-container hidden" id="new-chat-container">
-                <!-- محتوای صفحه ایجاد چت جدید بدون تغییر -->
+                <input type="text" class="search-box" id="new-chat-search" placeholder="جستجوی کاربر...">
+                
+                <!-- لیست کاربران موجود -->
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <div class="chat-avatar avatar-user">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">مدیر سعدی</div>
+                            <div class="chat-last-message">مدیر پیامرسان سعدی</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="chat-avatar avatar-user">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">کاربر نمونه ۱</div>
+                            <div class="chat-last-message">کاربر نمونه پیامرسان سعدی</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="chat-avatar avatar-user">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">کاربر نمونه ۲</div>
+                            <div class="chat-last-message">کاربر نمونه پیامرسان سعدی</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="chat-avatar avatar-bot">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="chat-info">
+                            <div class="chat-name">BotFather</div>
+                            <div class="chat-last-message">ربات هوشمند پاسخگو</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- صفحه ایجاد گروه -->
-            <div class="create-form hidden" id="create-group-container">
-                <!-- محتوای صفحه ایجاد گروه بدون تغییر -->
+            <div class="new-chat-container hidden" id="create-group-container">
+                <div class="form-group">
+                    <input type="text" class="auth-input" id="group-name" placeholder="نام گروه">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="auth-input" id="group-id" placeholder="ایدی گروه">
+                </div>
+                <div class="form-group">
+                    <textarea class="auth-input" id="group-bio" placeholder="بیوگرافی گروه" rows="3"></textarea>
+                </div>
+                <button class="auth-button" id="create-group-btn">ایجاد گروه</button>
             </div>
 
             <!-- صفحه ایجاد کانال -->
-            <div class="create-form hidden" id="create-channel-container">
-                <!-- محتوای صفحه ایجاد کانال بدون تغییر -->
+            <div class="new-chat-container hidden" id="create-channel-container">
+                <div class="form-group">
+                    <input type="text" class="auth-input" id="channel-name" placeholder="نام کانال">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="auth-input" id="channel-id" placeholder="ایدی کانال">
+                </div>
+                <div class="form-group">
+                    <textarea class="auth-input" id="channel-bio" placeholder="بیوگرافی کانال" rows="3"></textarea>
+                </div>
+                <button class="auth-button" id="create-channel-btn">ایجاد کانال</button>
             </div>
         </div>
 
@@ -330,9 +1265,6 @@
         </div>
     </div>
 
-    <!-- مودال‌ها -->
-    <!-- مودال‌های قبلی حفظ شده‌اند -->
-
     <script>
         // داده‌های برنامه
         let currentUser = null;
@@ -342,22 +1274,9 @@
         let users = [];
         let groups = [];
         let channels = [];
-        let savedMessages = [];
         let isTyping = false;
         let typingTimeout = null;
         let otpCode = null;
-
-        // کلیدهای ذخیره‌سازی
-        const STORAGE_KEYS = {
-            USERS: 'saadi_messenger_users',
-            CHATS: 'saadi_messenger_chats',
-            MESSAGES: 'saadi_messenger_messages',
-            CURRENT_USER: 'saadi_messenger_current_user',
-            GROUPS: 'saadi_messenger_groups',
-            CHANNELS: 'saadi_messenger_channels',
-            SETTINGS: 'saadi_messenger_settings',
-            SAVED_MESSAGES: 'saadi_messenger_saved_messages'
-        };
 
         // المان‌های DOM
         const elements = {
@@ -371,71 +1290,15 @@
             chatsList: document.getElementById('chats-list'),
             chatContainer: document.getElementById('chat-container'),
             messagesContainer: document.getElementById('messages-container'),
-            savedMessagesContainer: document.getElementById('saved-messages-container'),
-            savedMessagesList: document.getElementById('saved-messages-list'),
             settingsContainer: document.getElementById('settings-container'),
             newChatContainer: document.getElementById('new-chat-container'),
             createGroupContainer: document.getElementById('create-group-container'),
             createChannelContainer: document.getElementById('create-channel-container'),
-            profileContainer: document.getElementById('profile-container'),
             mainContent: document.getElementById('main-content'),
             menuDropdown: document.getElementById('menu-dropdown'),
             messageInput: document.getElementById('message-input'),
             typingIndicator: document.getElementById('typing-indicator'),
-            statusText: document.getElementById('status-text'),
-            availableUsersList: document.getElementById('available-users-list')
-        };
-
-        // تنظیمات پیش‌فرض
-        let appSettings = {
-            theme: 'dark',
-            notifications: {
-                message: true,
-                group: true,
-                channel: true,
-                sound: 'default'
-            },
-            privacy: {
-                lastSeen: 'everyone',
-                onlineStatus: 'everyone',
-                profilePic: 'everyone'
-            }
-        };
-
-        // توابع ذخیره‌سازی
-        const storage = {
-            // ذخیره داده‌ها
-            set: (key, data) => {
-                try {
-                    localStorage.setItem(key, JSON.stringify(data));
-                    return true;
-                } catch (e) {
-                    console.error('خطا در ذخیره‌سازی داده‌ها:', e);
-                    return false;
-                }
-            },
-            
-            // بازیابی داده‌ها
-            get: (key) => {
-                try {
-                    const data = localStorage.getItem(key);
-                    return data ? JSON.parse(data) : null;
-                } catch (e) {
-                    console.error('خطا در بازیابی داده‌ها:', e);
-                    return null;
-                }
-            },
-            
-            // حذف داده‌ها
-            remove: (key) => {
-                try {
-                    localStorage.removeItem(key);
-                    return true;
-                } catch (e) {
-                    console.error('خطا در حذف داده‌ها:', e);
-                    return false;
-                }
-            }
+            statusText: document.getElementById('status-text')
         };
 
         // مقداردهی اولیه
@@ -479,8 +1342,6 @@
             
             // رویدادهای دیگر
             document.getElementById('back-btn').addEventListener('click', showChatsList);
-            document.getElementById('back-from-profile-btn').addEventListener('click', showChatsList);
-            document.getElementById('back-from-saved-btn').addEventListener('click', showChatsList);
             document.getElementById('send-btn').addEventListener('click', sendMessage);
             document.getElementById('message-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -499,28 +1360,21 @@
             document.getElementById('new-chat-menu').addEventListener('click', showNewChatForm);
             document.getElementById('create-group-menu').addEventListener('click', showCreateGroupForm);
             document.getElementById('create-channel-menu').addEventListener('click', showCreateChannelForm);
-            document.getElementById('saved-messages-menu').addEventListener('click', showSavedMessages);
             
             // رویداد جستجو
             document.getElementById('search-btn').addEventListener('click', showSearch);
             
             // رویدادهای تنظیمات
-            document.getElementById('profile-settings').addEventListener('click', () => showProfileModal());
-            document.getElementById('privacy-settings').addEventListener('click', () => showModal('privacy-modal'));
+            document.getElementById('profile-settings').addEventListener('click', () => showMessage('صفحه پروفایل به زودی اضافه خواهد شد'));
+            document.getElementById('privacy-settings').addEventListener('click', () => showMessage('تنظیمات حریم خصوصی به زودی اضافه خواهد شد'));
             document.getElementById('theme-settings').addEventListener('click', toggleTheme);
-            document.getElementById('notification-settings').addEventListener('click', () => showModal('notification-modal'));
-            document.getElementById('help-settings').addEventListener('click', () => showHelp());
-            document.getElementById('logout-settings').addEventListener('click', () => showModal('logout-modal'));
+            document.getElementById('notification-settings').addEventListener('click', () => showMessage('تنظیمات اعلان‌ها به زودی اضافه خواهد شد'));
+            document.getElementById('help-settings').addEventListener('click', () => showMessage('صفحه راهنما به زودی اضافه خواهد شد'));
+            document.getElementById('logout-settings').addEventListener('click', logout);
             
             // رویدادهای فرم‌های ایجاد
-            document.getElementById('cancel-new-chat').addEventListener('click', showChatsList);
-            document.getElementById('start-new-chat').addEventListener('click', startNewChat);
-            
-            document.getElementById('cancel-create-group').addEventListener('click', showChatsList);
-            document.getElementById('create-group').addEventListener('click', createGroup);
-            
-            document.getElementById('cancel-create-channel').addEventListener('click', showChatsList);
-            document.getElementById('create-channel').addEventListener('click', createChannel);
+            document.getElementById('create-group-btn').addEventListener('click', createGroup);
+            document.getElementById('create-channel-btn').addEventListener('click', createChannel);
             
             // رویدادهای دکمه‌های چت
             document.getElementById('voice-call-btn').addEventListener('click', () => showMessage('تماس صوتی به زودی اضافه خواهد شد'));
@@ -532,10 +1386,6 @@
             
             // رویداد نمایش پروفایل
             document.getElementById('chat-with').addEventListener('click', showProfile);
-            document.getElementById('send-message-profile').addEventListener('click', () => {
-                elements.profileContainer.classList.add('hidden');
-                elements.chatContainer.classList.remove('hidden');
-            });
             
             // تنظیم ارتفاع خودکار برای فیلد ورودی پیام
             setupAutoResizeTextarea();
@@ -545,21 +1395,6 @@
                 if (!e.target.closest('.header-btn') && !e.target.closest('.menu-dropdown')) {
                     elements.menuDropdown.classList.add('hidden');
                 }
-                
-                // بستن منوی پیام با کلیک خارج از آن
-                if (!e.target.closest('.message-actions') && !e.target.closest('.message-menu')) {
-                    document.querySelectorAll('.message-menu').forEach(menu => {
-                        menu.remove();
-                    });
-                }
-            });
-            
-            // فوکوس روی فیلد ورودی پیام هنگام باز کردن چت
-            document.getElementById('message-input').addEventListener('focus', function() {
-                // اسکرول به پایین هنگام فوکوس روی فیلد ورودی
-                setTimeout(() => {
-                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-                }, 100);
             });
         }
 
@@ -574,146 +1409,94 @@
 
         // بارگذاری داده‌های ذخیره شده
         function loadStoredData() {
-            users = storage.get(STORAGE_KEYS.USERS) || [];
-            chats = storage.get(STORAGE_KEYS.CHATS) || [];
-            messages = storage.get(STORAGE_KEYS.MESSAGES) || {};
-            groups = storage.get(STORAGE_KEYS.GROUPS) || [];
-            channels = storage.get(STORAGE_KEYS.CHANNELS) || [];
-            savedMessages = storage.get(STORAGE_KEYS.SAVED_MESSAGES) || [];
-            currentUser = storage.get(STORAGE_KEYS.CURRENT_USER);
-            
-            // بارگذاری تنظیمات
-            const savedSettings = storage.get(STORAGE_KEYS.SETTINGS);
-            if (savedSettings) {
-                appSettings = savedSettings;
-            }
+            // در این نسخه ساده، از localStorage استفاده نمی‌کنیم
+            // فقط برای نمونه، داده‌ها را در حافظه نگه می‌داریم
         }
 
         // ایجاد کاربران نمونه
         function createSampleUsers() {
-            if (users.length === 0) {
-                users = [
+            users = [
+                {
+                    id: 1,
+                    username: 'مدیر سعدی',
+                    userid: 'admin',
+                    password: '123456',
+                    phone: '09123456789',
+                    online: true,
+                    verified: true,
+                    type: 'user',
+                    bio: 'مدیر پیامرسان سعدی'
+                },
+                {
+                    id: 2,
+                    username: 'کاربر نمونه ۱',
+                    userid: 'user1',
+                    password: '123456',
+                    phone: '09123456780',
+                    online: true,
+                    verified: false,
+                    type: 'user',
+                    bio: 'کاربر نمونه پیامرسان سعدی'
+                },
+                {
+                    id: 3,
+                    username: 'کاربر نمونه ۲',
+                    userid: 'user2',
+                    password: '123456',
+                    phone: '09123456781',
+                    online: true,
+                    verified: false,
+                    type: 'user',
+                    bio: 'کاربر نمونه پیامرسان سعدی'
+                },
+                {
+                    id: 4,
+                    username: 'BotFather',
+                    userid: 'botfather',
+                    password: '123456',
+                    phone: null,
+                    online: true,
+                    verified: true,
+                    type: 'bot',
+                    bio: 'ربات هوشمند پاسخگو به سوالات شما'
+                }
+            ];
+            
+            // ایجاد چت‌های نمونه
+            chats = [
+                {
+                    id: 'chat_support',
+                    participants: ['admin', 'support'],
+                    name: 'پشتیبانی سعدی',
+                    type: 'user',
+                    createdAt: new Date().toISOString(),
+                    unread: 0,
+                    lastMessage: 'به پیامرسان سعدی خوش آمدید!',
+                    lastMessageTime: new Date().toISOString()
+                }
+            ];
+            
+            // ایجاد پیام‌های نمونه
+            messages = {
+                'chat_support': [
                     {
                         id: 1,
-                        username: 'مدیر سعدی',
-                        userid: 'admin',
-                        password: '123456',
-                        phone: '09123456789',
-                        online: true,
-                        verified: true,
-                        type: 'user',
-                        bio: 'مدیر پیامرسان سعدی',
-                        lastSeen: new Date().toISOString(),
-                        number: '68995-63/5/53'
+                        text: 'به پیامرسان سعدی خوش آمدید!',
+                        sender: 'support',
+                        timestamp: new Date(Date.now() - 300000).toISOString(),
+                        chatId: 'chat_support',
+                        status: 'delivered'
                     },
                     {
                         id: 2,
-                        username: 'کاربر نمونه ۱',
-                        userid: 'user1',
-                        password: '123456',
-                        phone: '09123456780',
-                        online: true,
-                        verified: false,
-                        type: 'user',
-                        bio: 'کاربر نمونه پیامرسان سعدی',
-                        lastSeen: new Date().toISOString(),
-                        number: '12345-67/8/90'
-                    },
-                    {
-                        id: 3,
-                        username: 'کاربر نمونه ۲',
-                        userid: 'user2',
-                        password: '123456',
-                        phone: '09123456781',
-                        online: true,
-                        verified: false,
-                        type: 'user',
-                        bio: 'کاربر نمونه پیامرسان سعدی',
-                        lastSeen: new Date().toISOString(),
-                        number: '54321-09/8/76'
-                    },
-                    {
-                        id: 4,
-                        username: 'پشتیبانی سعدی',
-                        userid: 'support',
-                        password: '123456',
-                        phone: '02112345678',
-                        online: true,
-                        verified: true,
-                        type: 'user',
-                        bio: 'تیم پشتیبانی پیامرسان سعدی',
-                        lastSeen: new Date().toISOString(),
-                        number: '021-12345678'
-                    },
-                    {
-                        id: 5,
-                        username: 'BotFather',
-                        userid: 'botfather_bot',
-                        password: '123456',
-                        phone: null,
-                        online: true,
-                        verified: true,
-                        type: 'bot',
-                        bio: 'ربات هوشمند پاسخگو به سوالات شما',
-                        lastSeen: new Date().toISOString(),
-                        number: 'ربات'
+                        text: 'چگونه می‌توانم کمک کنم؟',
+                        sender: 'support',
+                        timestamp: new Date(Date.now() - 240000).toISOString(),
+                        chatId: 'chat_support',
+                        status: 'delivered'
                     }
-                ];
-                storage.set(STORAGE_KEYS.USERS, users);
-            }
-            
-            // ایجاد چت‌های نمونه
-            if (chats.length === 0) {
-                chats = [
-                    {
-                        id: 'chat_support',
-                        participants: ['admin', 'support'],
-                        name: 'پشتیبانی سعدی',
-                        type: 'user',
-                        createdAt: new Date().toISOString(),
-                        unread: 0,
-                        lastMessage: 'به پیامرسان سعدی خوش آمدید!',
-                        lastMessageTime: new Date().toISOString()
-                    },
-                    {
-                        id: 'saved_messages',
-                        participants: ['admin'],
-                        name: 'پیام‌های ذخیره شده',
-                        type: 'saved',
-                        createdAt: new Date().toISOString(),
-                        unread: 0,
-                        lastMessage: 'پیام‌های مهم خود را اینجا ذخیره کنید',
-                        lastMessageTime: new Date().toISOString()
-                    }
-                ];
-                storage.set(STORAGE_KEYS.CHATS, chats);
-            }
-            
-            // ایجاد پیام‌های نمونه
-            if (Object.keys(messages).length === 0) {
-                messages = {
-                    'chat_support': [
-                        {
-                            id: 1,
-                            text: 'به پیامرسان سعدی خوش آمدید!',
-                            sender: 'support',
-                            timestamp: new Date(Date.now() - 300000).toISOString(),
-                            chatId: 'chat_support',
-                            status: 'delivered'
-                        },
-                        {
-                            id: 2,
-                            text: 'چگونه می‌توانم کمک کنم؟',
-                            sender: 'support',
-                            timestamp: new Date(Date.now() - 240000).toISOString(),
-                            chatId: 'chat_support',
-                            status: 'delivered'
-                        }
-                    ],
-                    'saved_messages': []
-                };
-                storage.set(STORAGE_KEYS.MESSAGES, messages);
-            }
+                ]
+            };
         }
 
         // نمایش صفحه ورود
@@ -795,14 +1578,8 @@
                 return;
             }
             
-            // به‌روزرسانی وضعیت آنلاین
-            user.online = true;
-            user.lastSeen = new Date().toISOString();
-            storage.set(STORAGE_KEYS.USERS, users);
-            
             // ذخیره کاربر جاری
             currentUser = user;
-            storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
             
             showAuthMessage('ورود موفقیت‌آمیز بود!', 'success');
             setTimeout(() => {
@@ -848,18 +1625,14 @@
                 online: true,
                 verified: false,
                 type: 'user',
-                bio: 'کاربر جدید پیامرسان سعدی',
-                lastSeen: new Date().toISOString(),
-                number: 'جدید'
+                bio: 'کاربر جدید پیامرسان سعدی'
             };
             
             // ذخیره کاربر
             users.push(newUser);
-            storage.set(STORAGE_KEYS.USERS, users);
             
             // ذخیره کاربر جاری
             currentUser = newUser;
-            storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
             
             showAuthMessage('حساب کاربری با موفقیت ایجاد شد!', 'success');
             setTimeout(() => {
@@ -916,14 +1689,8 @@
                 return;
             }
             
-            // به‌روزرسانی وضعیت آنلاین
-            user.online = true;
-            user.lastSeen = new Date().toISOString();
-            storage.set(STORAGE_KEYS.USERS, users);
-            
             // ذخیره کاربر جاری
             currentUser = user;
-            storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
             
             showAuthMessage('ورود با موفقیت انجام شد!', 'success');
             setTimeout(() => {
@@ -946,8 +1713,6 @@
             elements.newChatContainer.classList.add('hidden');
             elements.createGroupContainer.classList.add('hidden');
             elements.createChannelContainer.classList.add('hidden');
-            elements.profileContainer.classList.add('hidden');
-            elements.savedMessagesContainer.classList.add('hidden');
             
             // نمایش بخش انتخاب شده
             switch(tabName) {
@@ -956,12 +1721,10 @@
                     document.getElementById('header-title').textContent = 'چت‌ها';
                     break;
                 case 'status':
-                    // می‌توانید این بخش را توسعه دهید
                     elements.chatsList.classList.remove('hidden');
                     document.getElementById('header-title').textContent = 'استاتوس';
                     break;
                 case 'calls':
-                    // می‌توانید این بخش را توسعه دهید
                     elements.chatsList.classList.remove('hidden');
                     document.getElementById('header-title').textContent = 'تماس‌ها';
                     break;
@@ -974,37 +1737,9 @@
 
         // بارگذاری چت‌ها
         function loadChats() {
-            // ترکیب تمام چت‌ها، گروه‌ها و کانال‌ها
-            const allChats = [
-                ...chats,
-                ...groups.map(group => ({
-                    id: group.id,
-                    name: group.name,
-                    type: 'group',
-                    participants: group.members,
-                    lastMessage: group.lastMessage || '',
-                    lastMessageTime: group.lastMessageTime || new Date().toISOString(),
-                    unread: group.unread || 0
-                })),
-                ...channels.map(channel => ({
-                    id: channel.id,
-                    name: channel.name,
-                    type: 'channel',
-                    participants: channel.members,
-                    lastMessage: channel.lastMessage || '',
-                    lastMessageTime: channel.lastMessageTime || new Date().toISOString(),
-                    unread: channel.unread || 0
-                }))
-            ];
-            
-            // فیلتر کردن چت‌های مربوط به کاربر جاری
-            const userChats = allChats.filter(chat => 
-                chat.participants && chat.participants.includes(currentUser.userid)
-            );
-            
             elements.chatsList.innerHTML = '';
             
-            if (userChats.length === 0) {
+            if (chats.length === 0) {
                 elements.chatsList.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">
@@ -1017,7 +1752,7 @@
                 return;
             }
             
-            userChats.forEach(chat => {
+            chats.forEach(chat => {
                 const chatElement = document.createElement('div');
                 chatElement.className = `chat-item ${chat.unread > 0 ? 'unread' : ''}`;
                 
@@ -1030,9 +1765,6 @@
                 } else if (chat.type === 'channel') {
                     avatarClass = 'avatar-channel';
                     avatarIcon = 'fas fa-bullhorn';
-                } else if (chat.type === 'saved') {
-                    avatarClass = 'avatar-bot';
-                    avatarIcon = 'fas fa-bookmark';
                 }
                 
                 chatElement.innerHTML = `
@@ -1041,7 +1773,6 @@
                     </div>
                     <div class="chat-info">
                         <div class="chat-name">
-                            ${chat.type === 'saved' ? '<span class="saved-messages-badge">ذخیره</span>' : ''}
                             ${chat.name}
                         </div>
                         <div class="chat-last-message">
@@ -1054,43 +1785,8 @@
                     </div>
                 `;
                 
-                chatElement.addEventListener('click', () => {
-                    if (chat.type === 'saved') {
-                        showSavedMessages();
-                    } else {
-                        openChat(chat);
-                    }
-                });
+                chatElement.addEventListener('click', () => openChat(chat));
                 elements.chatsList.appendChild(chatElement);
-            });
-        }
-
-        // بارگذاری لیست کاربران موجود
-        function loadAvailableUsers() {
-            elements.availableUsersList.innerHTML = '';
-            
-            // فیلتر کردن کاربران (به جز کاربر جاری)
-            const availableUsers = users.filter(user => 
-                user.userid !== currentUser.userid
-            );
-            
-            if (availableUsers.length === 0) {
-                elements.availableUsersList.innerHTML = '<div>کاربری برای چت موجود نیست</div>';
-                return;
-            }
-            
-            availableUsers.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.style.padding = '8px 0';
-                userElement.style.borderBottom = '1px solid var(--border-color)';
-                userElement.style.cursor = 'pointer';
-                
-                userElement.innerHTML = `
-                    <div><strong>${user.username}</strong> (<span class="userid-link" onclick="document.getElementById('new-chat-userid').value = '${user.userid}'">${user.userid}</span>)</div>
-                    <div style="font-size: 12px; color: var(--text-secondary);">${user.bio || 'بدون بیوگرافی'}</div>
-                `;
-                
-                elements.availableUsersList.appendChild(userElement);
             });
         }
 
@@ -1112,37 +1808,7 @@
             
             elements.chatsList.classList.add('hidden');
             elements.chatContainer.classList.remove('hidden');
-            elements.profileContainer.classList.add('hidden');
-            elements.savedMessagesContainer.classList.add('hidden');
             loadMessages(chat.id);
-            
-            // پاک کردن اعلان‌های خوانده شده
-            if (chat.unread > 0) {
-                chat.unread = 0;
-                
-                // به‌روزرسانی در ساختار داده مناسب
-                if (chat.type === 'group') {
-                    const groupIndex = groups.findIndex(g => g.id === chat.id);
-                    if (groupIndex !== -1) {
-                        groups[groupIndex].unread = 0;
-                        storage.set(STORAGE_KEYS.GROUPS, groups);
-                    }
-                } else if (chat.type === 'channel') {
-                    const channelIndex = channels.findIndex(c => c.id === chat.id);
-                    if (channelIndex !== -1) {
-                        channels[channelIndex].unread = 0;
-                        storage.set(STORAGE_KEYS.CHANNELS, channels);
-                    }
-                } else {
-                    const chatIndex = chats.findIndex(c => c.id === chat.id);
-                    if (chatIndex !== -1) {
-                        chats[chatIndex].unread = 0;
-                        storage.set(STORAGE_KEYS.CHATS, chats);
-                    }
-                }
-                
-                loadChats();
-            }
             
             // فوکوس روی فیلد ورودی پیام
             setTimeout(() => {
@@ -1185,33 +1851,10 @@
                 const messageElement = document.createElement('div');
                 messageElement.className = `message ${message.sender === currentUser.userid ? 'message-sent' : 'message-received'}`;
                 
-                let statusIcon = '';
-                if (message.sender === currentUser.userid) {
-                    statusIcon = '<span class="message-status"><i class="fas fa-check-double"></i></span>';
-                    
-                    // اضافه کردن منوی عملیات برای پیام‌های ارسالی
-                    messageElement.innerHTML = `
-                        <div class="message-actions">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </div>
-                        <div class="message-text">${parseMentions(message.text)}</div>
-                        <div class="message-time">${formatTime(message.timestamp)}</div>
-                        ${statusIcon}
-                    `;
-                    
-                    // اضافه کردن رویداد برای منوی عملیات
-                    const messageActions = messageElement.querySelector('.message-actions');
-                    messageActions.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        showMessageMenu(e.target, message);
-                    });
-                } else {
-                    messageElement.innerHTML = `
-                        <div class="message-text">${parseMentions(message.text)}</div>
-                        <div class="message-time">${formatTime(message.timestamp)}</div>
-                        ${statusIcon}
-                    `;
-                }
+                messageElement.innerHTML = `
+                    <div class="message-text">${message.text}</div>
+                    <div class="message-time">${formatTime(message.timestamp)}</div>
+                `;
                 
                 elements.messagesContainer.appendChild(messageElement);
             });
@@ -1220,262 +1863,12 @@
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
         }
 
-        // تجزیه و تبدیل اشاره‌ها به لینک
-        function parseMentions(text) {
-            // الگوی شناسایی @userid
-            const mentionPattern = /@(\w+)/g;
-            
-            return text.replace(mentionPattern, (match, userid) => {
-                // بررسی وجود کاربر با این ایدی
-                const user = users.find(u => u.userid === userid);
-                if (user) {
-                    return `<span class="mention" onclick="openMention('${userid}')">${match}</span>`;
-                }
-                
-                // بررسی وجود گروه با این ایدی
-                const group = groups.find(g => g.id === userid);
-                if (group) {
-                    return `<span class="mention" onclick="openMention('${userid}')">${match}</span>`;
-                }
-                
-                // بررسی وجود کانال با این ایدی
-                const channel = channels.find(c => c.id === userid);
-                if (channel) {
-                    return `<span class="mention" onclick="openMention('${userid}')">${match}</span>`;
-                }
-                
-                return match;
-            });
-        }
-
-        // باز کردن چت از طریق اشاره
-        function openMention(userid) {
-            // جستجو در کاربران
-            const user = users.find(u => u.userid === userid);
-            if (user) {
-                // بررسی اگر چت از قبل وجود دارد
-                let existingChat = chats.find(chat => 
-                    chat.participants && 
-                    chat.participants.includes(currentUser.userid) && 
-                    chat.participants.includes(userid)
-                );
-                
-                if (existingChat) {
-                    // باز کردن چت موجود
-                    openChat(existingChat);
-                    return;
-                }
-                
-                // ایجاد چت جدید
-                const newChat = {
-                    id: `chat_${currentUser.userid}_${userid}`,
-                    participants: [currentUser.userid, userid],
-                    name: user.username,
-                    type: 'user',
-                    createdAt: new Date().toISOString(),
-                    unread: 0,
-                    lastMessage: '',
-                    lastMessageTime: new Date().toISOString()
-                };
-                
-                // ذخیره چت
-                chats.push(newChat);
-                storage.set(STORAGE_KEYS.CHATS, chats);
-                
-                // باز کردن چت جدید
-                openChat(newChat);
-                return;
-            }
-            
-            // جستجو در گروه‌ها
-            const group = groups.find(g => g.id === userid);
-            if (group) {
-                openChat({
-                    id: group.id,
-                    name: group.name,
-                    type: 'group',
-                    participants: group.members,
-                    lastMessage: group.lastMessage || '',
-                    lastMessageTime: group.lastMessageTime || new Date().toISOString(),
-                    unread: group.unread || 0
-                });
-                return;
-            }
-            
-            // جستجو در کانال‌ها
-            const channel = channels.find(c => c.id === userid);
-            if (channel) {
-                openChat({
-                    id: channel.id,
-                    name: channel.name,
-                    type: 'channel',
-                    participants: channel.members,
-                    lastMessage: channel.lastMessage || '',
-                    lastMessageTime: channel.lastMessageTime || new Date().toISOString(),
-                    unread: channel.unread || 0
-                });
-                return;
-            }
-            
-            showMessage('ایدی مورد نظر یافت نشد');
-        }
-
-        // نمایش منوی پیام
-        function showMessageMenu(target, message) {
-            // حذف منوهای قبلی
-            document.querySelectorAll('.message-menu').forEach(menu => {
-                menu.remove();
-            });
-            
-            const menu = document.createElement('div');
-            menu.className = 'message-menu';
-            
-            // محاسبه موقعیت منو
-            const rect = target.getBoundingClientRect();
-            menu.style.top = `${rect.top + window.scrollY}px`;
-            menu.style.left = `${rect.left + window.scrollX - 160}px`;
-            
-            menu.innerHTML = `
-                <div class="message-menu-item" id="edit-message-${message.id}">
-                    <div class="message-menu-icon">
-                        <i class="fas fa-edit"></i>
-                    </div>
-                    <div class="message-menu-text">ویرایش پیام</div>
-                </div>
-                <div class="message-menu-item" id="save-message-${message.id}">
-                    <div class="message-menu-icon">
-                        <i class="fas fa-bookmark"></i>
-                    </div>
-                    <div class="message-menu-text">ذخیره پیام</div>
-                </div>
-                <div class="message-menu-item" id="delete-message-${message.id}">
-                    <div class="message-menu-icon">
-                        <i class="fas fa-trash"></i>
-                    </div>
-                    <div class="message-menu-text">حذف پیام</div>
-                </div>
-            `;
-            
-            document.body.appendChild(menu);
-            
-            // اضافه کردن رویدادها
-            document.getElementById(`edit-message-${message.id}`).addEventListener('click', () => {
-                editMessage(message);
-                menu.remove();
-            });
-            
-            document.getElementById(`save-message-${message.id}`).addEventListener('click', () => {
-                saveMessage(message);
-                menu.remove();
-            });
-            
-            document.getElementById(`delete-message-${message.id}`).addEventListener('click', () => {
-                deleteMessage(message);
-                menu.remove();
-            });
-        }
-
-        // ویرایش پیام
-        function editMessage(message) {
-            const newText = prompt('ویرایش پیام:', message.text);
-            if (newText && newText.trim() !== '') {
-                // پیدا کردن پیام در آرایه
-                const chatMessages = messages[message.chatId];
-                const messageIndex = chatMessages.findIndex(m => m.id === message.id);
-                
-                if (messageIndex !== -1) {
-                    // به‌روزرسانی پیام
-                    chatMessages[messageIndex].text = newText.trim();
-                    chatMessages[messageIndex].edited = true;
-                    chatMessages[messageIndex].editTimestamp = new Date().toISOString();
-                    
-                    // ذخیره تغییرات
-                    storage.set(STORAGE_KEYS.MESSAGES, messages);
-                    
-                    // بارگذاری مجدد پیام‌ها
-                    loadMessages(message.chatId);
-                    
-                    showMessage('پیام ویرایش شد', 'success');
-                }
-            }
-        }
-
-        // ذخیره پیام
-        function saveMessage(message) {
-            // بررسی اگر پیام قبلاً ذخیره شده است
-            const alreadySaved = savedMessages.find(m => m.id === message.id);
-            if (alreadySaved) {
-                showMessage('این پیام قبلاً ذخیره شده است', 'error');
-                return;
-            }
-            
-            // کپی پیام و اضافه کردن به لیست پیام‌های ذخیره شده
-            const savedMessage = {
-                ...message,
-                savedAt: new Date().toISOString(),
-                originalChatId: message.chatId
-            };
-            
-            savedMessages.push(savedMessage);
-            storage.set(STORAGE_KEYS.SAVED_MESSAGES, savedMessages);
-            
-            // اضافه کردن به چت پیام‌های ذخیره شده
-            if (!messages['saved_messages']) {
-                messages['saved_messages'] = [];
-            }
-            
-            messages['saved_messages'].push(savedMessage);
-            storage.set(STORAGE_KEYS.MESSAGES, messages);
-            
-            // به‌روزرسانی آخرین پیام در چت ذخیره شده
-            const savedChat = chats.find(c => c.id === 'saved_messages');
-            if (savedChat) {
-                savedChat.lastMessage = message.text;
-                savedChat.lastMessageTime = new Date().toISOString();
-                storage.set(STORAGE_KEYS.CHATS, chats);
-            }
-            
-            showMessage('پیام با موفقیت ذخیره شد', 'success');
-            loadChats();
-        }
-
-        // حذف پیام
-        function deleteMessage(message) {
-            if (confirm('آیا از حذف این پیام مطمئن هستید؟')) {
-                // پیدا کردن پیام در آرایه
-                const chatMessages = messages[message.chatId];
-                const messageIndex = chatMessages.findIndex(m => m.id === message.id);
-                
-                if (messageIndex !== -1) {
-                    // حذف پیام
-                    chatMessages.splice(messageIndex, 1);
-                    
-                    // ذخیره تغییرات
-                    storage.set(STORAGE_KEYS.MESSAGES, messages);
-                    
-                    // بارگذاری مجدد پیام‌ها
-                    loadMessages(message.chatId);
-                    
-                    showMessage('پیام حذف شد', 'success');
-                }
-            }
-        }
-
         // ارسال پیام
         function sendMessage() {
             const input = elements.messageInput;
             const text = input.value.trim();
             
             if (!text || !currentChat) return;
-            
-            // بررسی مجوز ارسال پیام
-            if (currentChat.type === 'channel') {
-                const channel = channels.find(c => c.id === currentChat.id);
-                if (channel && channel.owner !== currentUser.userid && !channel.admins.includes(currentUser.userid)) {
-                    showMessage('فقط مالک و ادمین‌ها می‌توانند در کانال پیام ارسال کنند');
-                    return;
-                }
-            }
             
             // ایجاد پیام جدید
             const newMessage = {
@@ -1493,27 +1886,15 @@
             }
             
             messages[currentChat.id].push(newMessage);
-            storage.set(STORAGE_KEYS.MESSAGES, messages);
             
             // افزودن به رابط کاربری
             const messageElement = document.createElement('div');
             messageElement.className = 'message message-sent';
             
             messageElement.innerHTML = `
-                <div class="message-actions">
-                    <i class="fas fa-ellipsis-v"></i>
-                </div>
-                <div class="message-text">${parseMentions(text)}</div>
+                <div class="message-text">${text}</div>
                 <div class="message-time">${formatTime(newMessage.timestamp)}</div>
-                <span class="message-status"><i class="fas fa-check-double"></i></span>
             `;
-            
-            // اضافه کردن رویداد برای منوی عملیات
-            const messageActions = messageElement.querySelector('.message-actions');
-            messageActions.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showMessageMenu(e.target, newMessage);
-            });
             
             elements.messagesContainer.appendChild(messageElement);
             
@@ -1534,10 +1915,8 @@
             updateLastMessage(currentChat.id, text);
             
             // اگر چت با ربات است، پاسخ خودکار ارسال شود
-            if (currentChat.participants.includes('botfather_bot')) {
+            if (currentChat.participants.includes('botfather')) {
                 simulateBotReply(currentChat.id, text);
-            } else if (currentChat.participants.includes('support')) {
-                simulateSupportReply(currentChat.id, text);
             }
             
             // فوکوس مجدد روی فیلد ورودی
@@ -1559,7 +1938,7 @@
                 const replyMessage = {
                     id: Date.now(),
                     text: replyText,
-                    sender: 'botfather_bot',
+                    sender: 'botfather',
                     timestamp: new Date().toISOString(),
                     chatId: chatId,
                     status: 'delivered'
@@ -1570,7 +1949,6 @@
                     messages[chatId] = [];
                 }
                 messages[chatId].push(replyMessage);
-                storage.set(STORAGE_KEYS.MESSAGES, messages);
                 
                 // نمایش پیام در رابط کاربری
                 if (currentChat && currentChat.id === chatId) {
@@ -1578,7 +1956,7 @@
                     messageElement.className = 'message message-received';
                     
                     messageElement.innerHTML = `
-                        <div class="message-text">${parseMentions(replyText)}</div>
+                        <div class="message-text">${replyText}</div>
                         <div class="message-time">${formatTime(replyMessage.timestamp)}</div>
                     `;
                     
@@ -1655,108 +2033,12 @@
             return generalReplies[Math.floor(Math.random() * generalReplies.length)];
         }
 
-        // شبیه‌سازی پاسخ ربات پشتیبانی
-        function simulateSupportReply(chatId, userMessage) {
-            if (!currentChat || currentChat.id !== chatId) return;
-            
-            // تاخیر برای ارسال پاسخ
-            setTimeout(() => {
-                if (!currentChat || currentChat.id !== chatId) return;
-                
-                // تولید پاسخ خودکار بر اساس پیام کاربر
-                const replyText = generateSupportReply(userMessage);
-                
-                // ایجاد پیام جدید
-                const replyMessage = {
-                    id: Date.now(),
-                    text: replyText,
-                    sender: 'support',
-                    timestamp: new Date().toISOString(),
-                    chatId: chatId,
-                    status: 'delivered'
-                };
-                
-                // ذخیره پیام
-                if (!messages[chatId]) {
-                    messages[chatId] = [];
-                }
-                messages[chatId].push(replyMessage);
-                storage.set(STORAGE_KEYS.MESSAGES, messages);
-                
-                // نمایش پیام در رابط کاربری
-                if (currentChat && currentChat.id === chatId) {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message message-received';
-                    
-                    messageElement.innerHTML = `
-                        <div class="message-text">${parseMentions(replyText)}</div>
-                        <div class="message-time">${formatTime(replyMessage.timestamp)}</div>
-                    `;
-                    
-                    elements.messagesContainer.appendChild(messageElement);
-                    
-                    // اسکرول به پایین
-                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-                    
-                    // به‌روزرسانی آخرین پیام
-                    updateLastMessage(chatId, replyText);
-                }
-                
-            }, 1000 + Math.random() * 2000); // تاخیر 1-3 ثانیه
-        }
-
-        // تولید پاسخ ربات پشتیبانی
-        function generateSupportReply(userMessage) {
-            const message = userMessage.toLowerCase();
-            const replies = [
-                'از اینکه با ما در ارتباط هستید متشکریم!',
-                'لطفاً مشکل خود را با جزئیات بیشتری توضیح دهید.',
-                'تیم پشتیبانی در اسرع وقت پاسخگوی شما خواهد بود.',
-                'آیا نیاز به راهنمایی در مورد ویژگی‌های خاصی دارید؟',
-                'ممنون از پیام شما. چگونه می‌توانم کمک کنم؟',
-                'برای دریافت کمک فنی، لطفاً مشکل خود را به طور دقیق شرح دهید.',
-                'ساعت کاری پشتیبانی: ۹ صبح تا ۵ عصر',
-                'اگر مشکل فوری دارید، با شماره ۰۲۱-۱۲۳۴۵۶۷۸ تماس بگیرید.'
-            ];
-            
-            // پاسخ‌های خاص برای کلمات کلیدی
-            if (message.includes('سلام') || message.includes('درود')) {
-                return 'سلام! به پیامرسان سعدی خوش آمدید. چگونه می‌توانم کمک کنم؟';
-            } else if (message.includes('تشکر') || message.includes('ممنون')) {
-                return 'خوشحالیم که توانسته‌ایم کمک کنیم!';
-            } else if (message.includes('مشکل') || message.includes('خطا')) {
-                return 'برای حل مشکل، لطفاً جزئیات بیشتری ارائه دهید.';
-            } else if (message.includes('قیمت') || message.includes('هزینه')) {
-                return 'پیامرسان سعدی کاملاً رایگان است!';
-            }
-            
-            const randomReply = replies[Math.floor(Math.random() * replies.length)];
-            return randomReply;
-        }
-
         // به‌روزرسانی آخرین پیام
         function updateLastMessage(chatId, lastMessageText) {
-            if (currentChat.type === 'group') {
-                const groupIndex = groups.findIndex(g => g.id === chatId);
-                if (groupIndex !== -1) {
-                    groups[groupIndex].lastMessage = lastMessageText;
-                    groups[groupIndex].lastMessageTime = new Date().toISOString();
-                    storage.set(STORAGE_KEYS.GROUPS, groups);
-                }
-            } else if (currentChat.type === 'channel') {
-                const channelIndex = channels.findIndex(c => c.id === chatId);
-                if (channelIndex !== -1) {
-                    channels[channelIndex].lastMessage = lastMessageText;
-                    channels[channelIndex].lastMessageTime = new Date().toISOString();
-                    storage.set(STORAGE_KEYS.CHANNELS, channels);
-                }
-            } else {
-                const chatIndex = chats.findIndex(c => c.id === chatId);
-                if (chatIndex !== -1) {
-                    chats[chatIndex].lastMessage = lastMessageText;
-                    chats[chatIndex].lastMessageTime = new Date().toISOString();
-                    storage.set(STORAGE_KEYS.CHATS, chats);
-                }
+            const chatIndex = chats.findIndex(c => c.id === chatId);
+            if (chatIndex !== -1) {
+                chats[chatIndex].lastMessage = lastMessageText;
+                chats[chatIndex].lastMessageTime = new Date().toISOString();
             }
             
             loadChats();
@@ -1768,8 +2050,6 @@
             elements.newChatContainer.classList.add('hidden');
             elements.createGroupContainer.classList.add('hidden');
             elements.createChannelContainer.classList.add('hidden');
-            elements.profileContainer.classList.add('hidden');
-            elements.savedMessagesContainer.classList.add('hidden');
             elements.chatsList.classList.remove('hidden');
             currentChat = null;
         }
@@ -1780,9 +2060,6 @@
             elements.chatsList.classList.add('hidden');
             elements.newChatContainer.classList.remove('hidden');
             document.getElementById('header-title').textContent = 'شروع چت جدید';
-            
-            // بارگذاری لیست کاربران موجود
-            loadAvailableUsers();
         }
 
         // نمایش فرم ایجاد گروه
@@ -1801,261 +2078,9 @@
             document.getElementById('header-title').textContent = 'ایجاد کانال';
         }
 
-        // نمایش پیام‌های ذخیره شده
-        function showSavedMessages() {
-            elements.menuDropdown.classList.add('hidden');
-            elements.chatsList.classList.add('hidden');
-            elements.chatContainer.classList.add('hidden');
-            elements.savedMessagesContainer.classList.remove('hidden');
-            
-            // بارگذاری پیام‌های ذخیره شده
-            loadSavedMessages();
-        }
-
-        // بارگذاری پیام‌های ذخیره شده
-        function loadSavedMessages() {
-            const savedChatMessages = messages['saved_messages'] || [];
-            
-            elements.savedMessagesList.innerHTML = '';
-            
-            if (savedChatMessages.length === 0) {
-                elements.savedMessagesList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-bookmark"></i>
-                        </div>
-                        <div>هنوز پیامی ذخیره نکرده‌اید</div>
-                        <div style="font-size: 14px; margin-top: 8px;">برای ذخیره پیام، روی پیام مورد نظر کلیک کرده و "ذخیره" را انتخاب کنید</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            savedChatMessages.forEach(message => {
-                const messageElement = document.createElement('div');
-                messageElement.className = `message ${message.sender === currentUser.userid ? 'message-sent' : 'message-received'}`;
-                
-                messageElement.innerHTML = `
-                    <div class="message-actions">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </div>
-                    <div class="message-text">${parseMentions(message.text)}</div>
-                    <div class="message-time">${formatTime(message.timestamp)}</div>
-                    <span class="message-status"><i class="fas fa-bookmark" style="color: #ff6b6b;"></i></span>
-                `;
-                
-                // اضافه کردن رویداد برای منوی عملیات
-                const messageActions = messageElement.querySelector('.message-actions');
-                messageActions.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showSavedMessageMenu(e.target, message);
-                });
-                
-                elements.savedMessagesList.appendChild(messageElement);
-            });
-        }
-
-        // نمایش منوی پیام ذخیره شده
-        function showSavedMessageMenu(target, message) {
-            // حذف منوهای قبلی
-            document.querySelectorAll('.message-menu').forEach(menu => {
-                menu.remove();
-            });
-            
-            const menu = document.createElement('div');
-            menu.className = 'message-menu';
-            
-            // محاسبه موقعیت منو
-            const rect = target.getBoundingClientRect();
-            menu.style.top = `${rect.top + window.scrollY}px`;
-            menu.style.left = `${rect.left + window.scrollX - 160}px`;
-            
-            menu.innerHTML = `
-                <div class="message-menu-item" id="unsave-message-${message.id}">
-                    <div class="message-menu-icon">
-                        <i class="fas fa-bookmark"></i>
-                    </div>
-                    <div class="message-menu-text">حذف از ذخیره شده</div>
-                </div>
-                <div class="message-menu-item" id="delete-saved-message-${message.id}">
-                    <div class="message-menu-icon">
-                        <i class="fas fa-trash"></i>
-                    </div>
-                    <div class="message-menu-text">حذف پیام</div>
-                </div>
-            `;
-            
-            document.body.appendChild(menu);
-            
-            // اضافه کردن رویدادها
-            document.getElementById(`unsave-message-${message.id}`).addEventListener('click', () => {
-                unsaveMessage(message);
-                menu.remove();
-            });
-            
-            document.getElementById(`delete-saved-message-${message.id}`).addEventListener('click', () => {
-                deleteSavedMessage(message);
-                menu.remove();
-            });
-        }
-
-        // حذف پیام از ذخیره شده
-        function unsaveMessage(message) {
-            // حذف از لیست پیام‌های ذخیره شده
-            const savedIndex = savedMessages.findIndex(m => m.id === message.id);
-            if (savedIndex !== -1) {
-                savedMessages.splice(savedIndex, 1);
-                storage.set(STORAGE_KEYS.SAVED_MESSAGES, savedMessages);
-            }
-            
-            // حذف از چت پیام‌های ذخیره شده
-            const chatIndex = messages['saved_messages'].findIndex(m => m.id === message.id);
-            if (chatIndex !== -1) {
-                messages['saved_messages'].splice(chatIndex, 1);
-                storage.set(STORAGE_KEYS.MESSAGES, messages);
-            }
-            
-            showMessage('پیام از ذخیره شده حذف شد', 'success');
-            loadSavedMessages();
-            loadChats();
-        }
-
-        // حذف پیام ذخیره شده
-        function deleteSavedMessage(message) {
-            if (confirm('آیا از حذف این پیام مطمئن هستید؟')) {
-                // حذف از لیست پیام‌های ذخیره شده
-                const savedIndex = savedMessages.findIndex(m => m.id === message.id);
-                if (savedIndex !== -1) {
-                    savedMessages.splice(savedIndex, 1);
-                    storage.set(STORAGE_KEYS.SAVED_MESSAGES, savedMessages);
-                }
-                
-                // حذف از چت پیام‌های ذخیره شده
-                const chatIndex = messages['saved_messages'].findIndex(m => m.id === message.id);
-                if (chatIndex !== -1) {
-                    messages['saved_messages'].splice(chatIndex, 1);
-                    storage.set(STORAGE_KEYS.MESSAGES, messages);
-                }
-                
-                // حذف از چت اصلی
-                if (messages[message.originalChatId]) {
-                    const originalIndex = messages[message.originalChatId].findIndex(m => m.id === message.id);
-                    if (originalIndex !== -1) {
-                        messages[message.originalChatId].splice(originalIndex, 1);
-                        storage.set(STORAGE_KEYS.MESSAGES, messages);
-                    }
-                }
-                
-                showMessage('پیام حذف شد', 'success');
-                loadSavedMessages();
-                loadChats();
-            }
-        }
-
         // نمایش پروفایل
         function showProfile() {
-            if (!currentChat) return;
-            
-            // پیدا کردن کاربر مربوطه
-            let profileUser = null;
-            if (currentChat.type === 'user') {
-                const otherUserId = currentChat.participants.find(id => id !== currentUser.userid);
-                profileUser = users.find(u => u.userid === otherUserId);
-            } else if (currentChat.type === 'group') {
-                const group = groups.find(g => g.id === currentChat.id);
-                if (group) {
-                    profileUser = {
-                        username: group.name,
-                        userid: group.id,
-                        bio: group.bio,
-                        online: true,
-                        verified: false,
-                        number: 'گروه'
-                    };
-                }
-            } else if (currentChat.type === 'channel') {
-                const channel = channels.find(c => c.id === currentChat.id);
-                if (channel) {
-                    profileUser = {
-                        username: channel.name,
-                        userid: channel.id,
-                        bio: channel.bio,
-                        online: true,
-                        verified: false,
-                        number: 'کانال'
-                    };
-                }
-            }
-            
-            if (!profileUser) return;
-            
-            // پر کردن اطلاعات پروفایل
-            document.getElementById('profile-name').innerHTML = `
-                ${profileUser.username}
-                ${profileUser.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
-            `;
-            document.getElementById('profile-status').textContent = profileUser.online ? 'آنلاین' : 'آفلاین';
-            document.getElementById('profile-last-seen').textContent = 'به تازگی';
-            document.getElementById('profile-number').textContent = profileUser.number;
-            document.getElementById('profile-username').textContent = profileUser.userid;
-            document.getElementById('profile-bio').textContent = profileUser.bio;
-            
-            // تنظیم آواتار
-            const profileAvatar = document.getElementById('profile-avatar');
-            profileAvatar.className = `profile-avatar ${currentChat.type === 'group' ? 'avatar-group' : currentChat.type === 'channel' ? 'avatar-channel' : 'avatar-user'}`;
-            profileAvatar.innerHTML = `<i class="${currentChat.type === 'group' ? 'fas fa-users' : currentChat.type === 'channel' ? 'fas fa-bullhorn' : 'fas fa-user'}"></i>`;
-            
-            elements.chatContainer.classList.add('hidden');
-            elements.profileContainer.classList.remove('hidden');
-        }
-
-        // شروع چت جدید
-        function startNewChat() {
-            const userid = document.getElementById('new-chat-userid').value.trim();
-            
-            if (!userid) {
-                showMessage('لطفاً ایدی کاربر مقابل را وارد کنید');
-                return;
-            }
-            
-            // بررسی وجود کاربر
-            const user = users.find(u => u.userid === userid);
-            if (!user) {
-                showMessage('کاربری با این ایدی یافت نشد');
-                return;
-            }
-            
-            // بررسی اگر چت از قبل وجود دارد
-            let existingChat = chats.find(chat => 
-                chat.participants && 
-                chat.participants.includes(currentUser.userid) && 
-                chat.participants.includes(userid)
-            );
-            
-            if (existingChat) {
-                // باز کردن چت موجود
-                openChat(existingChat);
-                return;
-            }
-            
-            // ایجاد چت جدید
-            const newChat = {
-                id: `chat_${currentUser.userid}_${userid}`,
-                participants: [currentUser.userid, userid],
-                name: user.username,
-                type: 'user',
-                createdAt: new Date().toISOString(),
-                unread: 0,
-                lastMessage: '',
-                lastMessageTime: new Date().toISOString()
-            };
-            
-            // ذخیره چت
-            chats.push(newChat);
-            storage.set(STORAGE_KEYS.CHATS, chats);
-            
-            // باز کردن چت جدید
-            openChat(newChat);
+            showMessage('صفحه پروفایل به زودی اضافه خواهد شد');
         }
 
         // ایجاد گروه
@@ -2063,17 +2088,9 @@
             const name = document.getElementById('group-name').value.trim();
             const groupId = document.getElementById('group-id').value.trim();
             const bio = document.getElementById('group-bio').value.trim();
-            const memberId = document.getElementById('group-member').value.trim();
             
             if (!name || !groupId) {
                 showMessage('لطفاً نام و ایدی گروه را وارد کنید');
-                return;
-            }
-            
-            // بررسی تکراری نبودن ایدی گروه
-            const existingGroup = groups.find(g => g.id === groupId);
-            if (existingGroup) {
-                showMessage('گروهی با این ایدی قبلاً ایجاد شده است');
                 return;
             }
             
@@ -2084,7 +2101,7 @@
                 bio: bio,
                 owner: currentUser.userid,
                 admins: [currentUser.userid],
-                members: [currentUser.userid], // ابتدا فقط کاربر جاری عضو است
+                members: [currentUser.userid],
                 createdAt: new Date().toISOString(),
                 unread: 0,
                 lastMessage: '',
@@ -2092,19 +2109,19 @@
                 reactionsEnabled: true
             };
             
-            // اگر کاربری برای اضافه کردن مشخص شده، بررسی و اضافه کردن
-            if (memberId) {
-                const userToAdd = users.find(u => u.userid === memberId);
-                if (userToAdd) {
-                    newGroup.members.push(memberId);
-                } else {
-                    showMessage('کاربری با این ایدی یافت نشد، گروه بدون عضو اضافی ایجاد شد');
-                }
-            }
-            
             // ذخیره گروه
             groups.push(newGroup);
-            storage.set(STORAGE_KEYS.GROUPS, groups);
+            
+            // اضافه کردن به چت‌ها
+            chats.push({
+                id: newGroup.id,
+                name: newGroup.name,
+                type: 'group',
+                participants: newGroup.members,
+                lastMessage: newGroup.lastMessage || '',
+                lastMessageTime: newGroup.lastMessageTime || new Date().toISOString(),
+                unread: newGroup.unread || 0
+            });
             
             showMessage('گروه با موفقیت ایجاد شد!', 'success');
             
@@ -2124,13 +2141,6 @@
                 return;
             }
             
-            // بررسی تکراری نبودن ایدی کانال
-            const existingChannel = channels.find(c => c.id === channelId);
-            if (existingChannel) {
-                showMessage('کانالی با این ایدی قبلاً ایجاد شده است');
-                return;
-            }
-            
             // ایجاد کانال جدید
             const newChannel = {
                 id: channelId,
@@ -2147,7 +2157,17 @@
             
             // ذخیره کانال
             channels.push(newChannel);
-            storage.set(STORAGE_KEYS.CHANNELS, channels);
+            
+            // اضافه کردن به چت‌ها
+            chats.push({
+                id: newChannel.id,
+                name: newChannel.name,
+                type: 'channel',
+                participants: newChannel.members,
+                lastMessage: newChannel.lastMessage || '',
+                lastMessageTime: newChannel.lastMessageTime || new Date().toISOString(),
+                unread: newChannel.unread || 0
+            });
             
             showMessage('کانال با موفقیت ایجاد شد!', 'success');
             
@@ -2158,201 +2178,15 @@
 
         // نمایش صفحه جستجو
         function showSearch() {
-            const searchTerm = prompt('جستجو در پیامرسان:');
-            if (!searchTerm) return;
-            
-            // جستجو در کاربران، گروه‌ها و کانال‌ها
-            const searchResults = {
-                users: users.filter(user => 
-                    user.username.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    user.userid.toLowerCase().includes(searchTerm.toLowerCase())
-                ),
-                groups: groups.filter(group => 
-                    group.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    group.id.toLowerCase().includes(searchTerm.toLowerCase())
-                ),
-                channels: channels.filter(channel => 
-                    channel.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    channel.id.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            };
-            
-            // نمایش نتایج جستجو
-            let resultsHTML = '';
-            
-            if (searchResults.users.length > 0) {
-                resultsHTML += '<div style="padding: 10px; background: var(--border-color); margin-bottom: 10px; border-radius: 8px;">کاربران:</div>';
-                searchResults.users.forEach(user => {
-                    resultsHTML += `
-                        <div class="search-result-item" onclick="openMention('${user.userid}')">
-                            <div><strong>${user.username}</strong> (${user.userid})</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">${user.bio || 'بدون بیوگرافی'}</div>
-                        </div>
-                    `;
-                });
-            }
-            
-            if (searchResults.groups.length > 0) {
-                resultsHTML += '<div style="padding: 10px; background: var(--border-color); margin-bottom: 10px; border-radius: 8px;">گروه‌ها:</div>';
-                searchResults.groups.forEach(group => {
-                    resultsHTML += `
-                        <div class="search-result-item" onclick="openMention('${group.id}')">
-                            <div><strong>${group.name}</strong> (${group.id})</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">${group.bio || 'بدون بیوگرافی'}</div>
-                        </div>
-                    `;
-                });
-            }
-            
-            if (searchResults.channels.length > 0) {
-                resultsHTML += '<div style="padding: 10px; background: var(--border-color); margin-bottom: 10px; border-radius: 8px;">کانال‌ها:</div>';
-                searchResults.channels.forEach(channel => {
-                    resultsHTML += `
-                        <div class="search-result-item" onclick="openMention('${channel.id}')">
-                            <div><strong>${channel.name}</strong> (${channel.id})</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">${channel.bio || 'بدون بیوگرافی'}</div>
-                        </div>
-                    `;
-                });
-            }
-            
-            if (resultsHTML === '') {
-                showMessage('هیچ نتیجه‌ای برای جستجوی شما یافت نشد');
-                return;
-            }
-            
-            // ایجاد مودال برای نمایش نتایج
-            const modal = document.createElement('div');
-            modal.className = 'modal show';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="modal-title">نتایج جستجو برای "${searchTerm}"</div>
-                        <button class="modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="search-results">
-                            ${resultsHTML}
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="modal-btn primary" onclick="this.parentElement.parentElement.parentElement.remove()">بستن</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-        
-        // نمایش مودال
-        function showModal(modalId) {
-            document.getElementById(modalId).classList.add('show');
-        }
-        
-        // پنهان کردن مودال
-        function hideModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-        
-        // نمایش مودال پروفایل
-        function showProfileModal() {
-            if (!currentUser) return;
-            
-            document.getElementById('edit-username').value = currentUser.username;
-            document.getElementById('edit-userid').value = currentUser.userid;
-            document.getElementById('edit-bio').value = currentUser.bio || '';
-            
-            showModal('profile-modal');
-        }
-        
-        // ذخیره پروفایل
-        function saveProfile() {
-            if (!currentUser) return;
-            
-            const username = document.getElementById('edit-username').value;
-            const userid = document.getElementById('edit-userid').value;
-            const bio = document.getElementById('edit-bio').value;
-            
-            if (!username || !userid) {
-                showMessage('لطفاً نام کاربری و ایدی را وارد کنید', 'error');
-                return;
-            }
-            
-            // بررسی تکراری نبودن نام کاربری و ایدی
-            const existingUser = users.find(item => 
-                item.id !== currentUser.id && 
-                (item.username === username || item.userid === userid)
-            );
-            
-            if (existingUser) {
-                showMessage('این نام کاربری یا ایدی قبلاً استفاده شده است', 'error');
-                return;
-            }
-            
-            // به‌روزرسانی کاربر
-            currentUser.username = username;
-            currentUser.userid = userid;
-            currentUser.bio = bio;
-            
-            // به‌روزرسانی در لیست کاربران
-            const userIndex = users.findIndex(u => u.id === currentUser.id);
-            if (userIndex !== -1) {
-                users[userIndex] = currentUser;
-                storage.set(STORAGE_KEYS.USERS, users);
-            }
-            
-            // ذخیره کاربر جاری
-            storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
-            
-            showMessage('پروفایل با موفقیت به‌روزرسانی شد', 'success');
-            hideModal('profile-modal');
-        }
-        
-        // ذخیره تنظیمات حریم خصوصی
-        function savePrivacySettings() {
-            appSettings.privacy.lastSeen = document.getElementById('last-seen-privacy').value;
-            appSettings.privacy.onlineStatus = document.getElementById('online-privacy').value;
-            appSettings.privacy.profilePic = document.getElementById('profile-pic-privacy').value;
-            
-            storage.set(STORAGE_KEYS.SETTINGS, appSettings);
-            
-            showMessage('تنظیمات حریم خصوصی ذخیره شد', 'success');
-            hideModal('privacy-modal');
-        }
-        
-        // ذخیره تنظیمات اعلان‌ها
-        function saveNotificationSettings() {
-            appSettings.notifications.message = document.getElementById('message-notifications').checked;
-            appSettings.notifications.group = document.getElementById('group-notifications').checked;
-            appSettings.notifications.channel = document.getElementById('channel-notifications').checked;
-            appSettings.notifications.sound = document.getElementById('notification-sound').value;
-            
-            storage.set(STORAGE_KEYS.SETTINGS, appSettings);
-            
-            showMessage('تنظیمات اعلان‌ها ذخیره شد', 'success');
-            hideModal('notification-modal');
-        }
-        
-        // نمایش تنظیمات اعلان‌ها
-        function showNotificationSettings() {
-            document.getElementById('message-notifications').checked = appSettings.notifications.message;
-            document.getElementById('group-notifications').checked = appSettings.notifications.group;
-            document.getElementById('channel-notifications').checked = appSettings.notifications.channel;
-            document.getElementById('notification-sound').value = appSettings.notifications.sound;
-            
-            showModal('notification-modal');
-        }
-        
-        // نمایش راهنما
-        function showHelp() {
-            showMessage('راهنمای استفاده از پیامرسان سعدی:\n\n• برای شروع چت جدید، روی دکمه ⋮ کلیک کنید\n• برای ایجاد گروه یا کانال، از منوی ⋮ استفاده کنید\n• برای ارسال پیام، در صفحه چت پیام خود را تایپ کرده و دکمه ارسال را بزنید\n• برای اشاره به کاربران، گروه‌ها یا کانال‌ها از @ استفاده کنید\n• در تنظیمات می‌توانید پروفایل، حریم خصوصی و سایر تنظیمات را تغییر دهید');
+            showMessage('قابلیت جستجو به زودی اضافه خواهد شد');
         }
         
         // تغییر تم
         function toggleTheme() {
-            if (appSettings.theme === 'dark') {
+            const isDark = document.body.style.getPropertyValue('--background-color') === '#111b21' || 
+                          !document.body.style.getPropertyValue('--background-color');
+            
+            if (isDark) {
                 // تغییر به تم روشن
                 document.body.style.setProperty('--background-color', '#f0f2f5');
                 document.body.style.setProperty('--secondary-color', '#ffffff');
@@ -2362,9 +2196,6 @@
                 document.body.style.setProperty('--message-received', '#ffffff');
                 document.body.style.setProperty('--border-color', '#e9edef');
                 document.body.style.setProperty('--online-status', '#00a884');
-                
-                appSettings.theme = 'light';
-                storage.set(STORAGE_KEYS.SETTINGS, appSettings);
                 
                 showMessage('تم روز فعال شد', 'success');
             } else {
@@ -2378,29 +2209,13 @@
                 document.body.style.setProperty('--border-color', '#2a3942');
                 document.body.style.setProperty('--online-status', '#4ade80');
                 
-                appSettings.theme = 'dark';
-                storage.set(STORAGE_KEYS.SETTINGS, appSettings);
-                
                 showMessage('تم شب فعال شد', 'success');
             }
         }
         
         // خروج از حساب
         function logout() {
-            if (currentUser) {
-                // به‌روزرسانی وضعیت آنلاین
-                const userIndex = users.findIndex(u => u.id === currentUser.id);
-                if (userIndex !== -1) {
-                    users[userIndex].online = false;
-                    users[userIndex].lastSeen = new Date().toISOString();
-                    storage.set(STORAGE_KEYS.USERS, users);
-                }
-            }
-            
             currentUser = null;
-            storage.remove(STORAGE_KEYS.CURRENT_USER);
-            
-            hideModal('logout-modal');
             showAuthScreen();
         }
         
@@ -2421,7 +2236,6 @@
             
             if (!isTyping) {
                 isTyping = true;
-                // در یک برنامه واقعی، اینجا وضعیت "در حال تایپ" به سرور ارسال می‌شود
             }
         }
         
