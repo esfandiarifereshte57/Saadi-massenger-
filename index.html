@@ -500,7 +500,6 @@
             flex-direction: column;
             gap: 2px;
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
-            /* ارتفاع پیام‌ها را تنظیم می‌کنیم تا جای تایپ کردن دیده شود */
             max-height: calc(100vh - 140px);
         }
 
@@ -512,6 +511,7 @@
             animation: slideIn 0.2s ease;
             position: relative;
             margin-bottom: 2px;
+            transition: all 0.3s ease;
         }
 
         @keyframes slideIn {
@@ -542,18 +542,69 @@
             color: var(--text-secondary);
             text-align: left;
             opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
         }
 
         .message-status {
-            position: absolute;
-            bottom: 6px;
-            left: 8px;
-            font-size: 12px;
+            font-size: 10px;
             color: var(--text-secondary);
         }
 
         .message-sent .message-status {
             color: #8696a0;
+        }
+
+        /* دکمه حذف پیام */
+        .message-actions {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        .message:hover .message-actions {
+            display: flex;
+        }
+
+        .delete-message-btn {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 12px;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-message-btn:active {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        /* پیام حذف شده */
+        .message-deleted {
+            opacity: 0.6;
+            background: rgba(255, 107, 107, 0.1) !important;
+        }
+
+        .message-deleted .message-text {
+            font-style: italic;
+            color: var(--text-secondary);
         }
 
         .input-container {
@@ -564,7 +615,6 @@
             gap: 12px;
             border-top: 1px solid var(--border-color);
             min-height: 62px;
-            /* این قسمت را در پایین ثابت می‌کنیم */
             position: fixed;
             bottom: 60px;
             left: 0;
@@ -1445,6 +1495,7 @@
         </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         // داده‌های برنامه
         let currentUser = null;
@@ -1456,6 +1507,7 @@
         let channels = [];
         let isTyping = false;
         let typingTimeout = null;
+        let socket = null;
 
         // کلیدهای ذخیره‌سازی
         const STORAGE_KEYS = {
@@ -1491,7 +1543,6 @@
 
         // توابع ذخیره‌سازی
         const storage = {
-            // ذخیره داده‌ها
             set: (key, data) => {
                 try {
                     localStorage.setItem(key, JSON.stringify(data));
@@ -1502,7 +1553,6 @@
                 }
             },
             
-            // بازیابی داده‌ها
             get: (key) => {
                 try {
                     const data = localStorage.getItem(key);
@@ -1513,7 +1563,6 @@
                 }
             },
             
-            // حذف داده‌ها
             remove: (key) => {
                 try {
                     localStorage.removeItem(key);
@@ -1527,6 +1576,12 @@
 
         // مقداردهی اولیه
         function init() {
+            // اتصال به Socket.IO
+            socket = io();
+            
+            // تنظیم رویدادهای Socket.IO
+            setupSocketEvents();
+            
             // بارگذاری داده‌های ذخیره شده
             loadStoredData();
             
@@ -1635,10 +1690,43 @@
             
             // فوکوس روی فیلد ورودی پیام هنگام باز کردن چت
             document.getElementById('message-input').addEventListener('focus', function() {
-                // اسکرول به پایین هنگام فوکوس روی فیلد ورودی
                 setTimeout(() => {
                     elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
                 }, 100);
+            });
+        }
+
+        // تنظیم رویدادهای Socket.IO
+        function setupSocketEvents() {
+            // دریافت پیام جدید
+            socket.on('receive-message', (message) => {
+                if (currentChat && currentChat.id === message.chatId) {
+                    addMessageToUI(message);
+                }
+                updateLastMessage(message.chatId, message.text);
+            });
+
+            // دریافت اطلاعیه حذف پیام
+            socket.on('message-deleted', (data) => {
+                deleteMessageInUI(data.messageId);
+            });
+
+            // دریافت اطلاعیه ویرایش پیام
+            socket.on('message-edited', (data) => {
+                updateMessageInUI(data.messageId, data.newText, data.editedAt);
+            });
+
+            // وضعیت تایپ کردن
+            socket.on('user-typing', (data) => {
+                if (currentChat && currentChat.id === data.chatId && data.userId !== currentUser.userid) {
+                    showTypingIndicator(data.userId);
+                }
+            });
+
+            socket.on('user-stop-typing', (data) => {
+                if (currentChat && currentChat.id === data.chatId) {
+                    hideTypingIndicator();
+                }
             });
         }
 
@@ -1739,7 +1827,9 @@
                             sender: '@support',
                             timestamp: new Date(Date.now() - 300000).toISOString(),
                             chatId: 'chat_support',
-                            status: 'delivered'
+                            status: 'delivered',
+                            isEdited: false,
+                            isDeleted: false
                         },
                         {
                             id: 2,
@@ -1747,7 +1837,9 @@
                             sender: '@support',
                             timestamp: new Date(Date.now() - 240000).toISOString(),
                             chatId: 'chat_support',
-                            status: 'delivered'
+                            status: 'delivered',
+                            isEdited: false,
+                            isDeleted: false
                         }
                     ],
                     'chat_guest': [
@@ -1757,7 +1849,9 @@
                             sender: '@guest',
                             timestamp: new Date(Date.now() - 180000).toISOString(),
                             chatId: 'chat_guest',
-                            status: 'delivered'
+                            status: 'delivered',
+                            isEdited: false,
+                            isDeleted: false
                         }
                     ]
                 };
@@ -1905,7 +1999,6 @@
 
         // تغییر تب اصلی
         function switchTab(tabName) {
-            // به‌روزرسانی تب‌های فعال
             document.querySelectorAll('.tab-item').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1926,12 +2019,10 @@
                     document.getElementById('header-title').textContent = 'چت‌ها';
                     break;
                 case 'status':
-                    // می‌توانید این بخش را توسعه دهید
                     elements.chatsList.classList.remove('hidden');
                     document.getElementById('header-title').textContent = 'استاتوس';
                     break;
                 case 'calls':
-                    // می‌توانید این بخش را توسعه دهید
                     elements.chatsList.classList.remove('hidden');
                     document.getElementById('header-title').textContent = 'تماس‌ها';
                     break;
@@ -1944,7 +2035,6 @@
 
         // بارگذاری چت‌ها
         function loadChats() {
-            // ترکیب تمام چت‌ها، گروه‌ها و کانال‌ها
             const allChats = [
                 ...chats,
                 ...groups.map(group => ({
@@ -1967,7 +2057,6 @@
                 }))
             ];
             
-            // فیلتر کردن چت‌های مربوط به کاربر جاری
             const userChats = allChats.filter(chat => 
                 chat.participants && chat.participants.includes(currentUser.userid)
             );
@@ -2049,7 +2138,6 @@
             if (chat.unread > 0) {
                 chat.unread = 0;
                 
-                // به‌روزرسانی در ساختار داده مناسب
                 if (chat.type === 'group') {
                     const groupIndex = groups.findIndex(g => g.id === chat.id);
                     if (groupIndex !== -1) {
@@ -2111,24 +2199,74 @@
             }
             
             chatMessages.forEach(message => {
-                const messageElement = document.createElement('div');
-                messageElement.className = `message ${message.sender === currentUser.userid ? 'message-sent' : 'message-received'}`;
-                
-                let statusIcon = '';
-                if (message.sender === currentUser.userid) {
-                    statusIcon = '<span class="message-status"><i class="fas fa-check-double"></i></span>';
+                if (!message.isDeleted) {
+                    addMessageToUI(message);
+                } else {
+                    addDeletedMessageToUI(message);
                 }
-                
-                messageElement.innerHTML = `
-                    <div class="message-text">${message.text}</div>
-                    <div class="message-time">${formatTime(message.timestamp)}</div>
-                    ${statusIcon}
-                `;
-                elements.messagesContainer.appendChild(messageElement);
             });
             
             // اسکرول به پایین
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+        }
+
+        // افزودن پیام به رابط کاربری
+        function addMessageToUI(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${message.sender === currentUser.userid ? 'message-sent' : 'message-received'}`;
+            messageElement.setAttribute('data-message-id', message.id);
+            
+            let statusIcon = '';
+            if (message.sender === currentUser.userid) {
+                statusIcon = '<span class="message-status"><i class="fas fa-check-double"></i></span>';
+            }
+            
+            let editBadge = '';
+            if (message.isEdited) {
+                editBadge = ' <span style="font-size:10px;color:var(--text-secondary)">(ویرایش شده)</span>';
+            }
+            
+            messageElement.innerHTML = `
+                <div class="message-text">${message.text}${editBadge}</div>
+                <div class="message-time">
+                    ${formatMessageTime(message.timestamp)}
+                    ${statusIcon}
+                </div>
+                ${message.sender === currentUser.userid ? `
+                    <div class="message-actions">
+                        <button class="delete-message-btn" onclick="deleteMessage(${message.id})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+            
+            elements.messagesContainer.appendChild(messageElement);
+            
+            // حذف حالت خالی
+            const emptyState = elements.messagesContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            // اسکرول به پایین
+            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+        }
+
+        // افزودن پیام حذف شده به رابط کاربری
+        function addDeletedMessageToUI(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message message-deleted ${message.sender === currentUser.userid ? 'message-sent' : 'message-received'}`;
+            messageElement.setAttribute('data-message-id', message.id);
+            
+            messageElement.innerHTML = `
+                <div class="message-text">این پیام حذف شده است</div>
+                <div class="message-time">
+                    ${formatMessageTime(message.timestamp)}
+                </div>
+            `;
+            
+            elements.messagesContainer.appendChild(messageElement);
         }
 
         // ارسال پیام
@@ -2154,7 +2292,9 @@
                 sender: currentUser.userid,
                 timestamp: new Date().toISOString(),
                 chatId: currentChat.id,
-                status: 'delivered'
+                status: 'delivered',
+                isEdited: false,
+                isDeleted: false
             };
             
             // ذخیره پیام
@@ -2165,29 +2305,15 @@
             messages[currentChat.id].push(newMessage);
             storage.set(STORAGE_KEYS.MESSAGES, messages);
             
-            // افزودن به رابط کاربری
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message message-sent';
+            // ارسال به سرور
+            socket.emit('send-message', newMessage);
             
-            messageElement.innerHTML = `
-                <div class="message-text">${text}</div>
-                <div class="message-time">${formatTime(newMessage.timestamp)}</div>
-                <span class="message-status"><i class="fas fa-check-double"></i></span>
-            `;
-            elements.messagesContainer.appendChild(messageElement);
+            // افزودن به رابط کاربری
+            addMessageToUI(newMessage);
             
             // پاک کردن فیلد ورودی
             input.value = '';
             input.style.height = 'auto';
-            
-            // حذف حالت خالی
-            const emptyState = elements.messagesContainer.querySelector('.empty-state');
-            if (emptyState) {
-                emptyState.remove();
-            }
-            
-            // اسکرول به پایین
-            elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
             
             // به‌روزرسانی آخرین پیام
             updateLastMessage(currentChat.id, text);
@@ -2205,50 +2331,34 @@
         function simulateSupportReply(chatId, userMessage) {
             if (!currentChat || currentChat.id !== chatId) return;
             
-            // تاخیر برای ارسال پاسخ
             setTimeout(() => {
                 if (!currentChat || currentChat.id !== chatId) return;
                 
-                // تولید پاسخ خودکار بر اساس پیام کاربر
                 const replyText = generateSupportReply(userMessage);
                 
-                // ایجاد پیام جدید
                 const replyMessage = {
                     id: Date.now(),
                     text: replyText,
                     sender: '@support',
                     timestamp: new Date().toISOString(),
                     chatId: chatId,
-                    status: 'delivered'
+                    status: 'delivered',
+                    isEdited: false,
+                    isDeleted: false
                 };
                 
-                // ذخیره پیام
                 if (!messages[chatId]) {
                     messages[chatId] = [];
                 }
                 messages[chatId].push(replyMessage);
                 storage.set(STORAGE_KEYS.MESSAGES, messages);
                 
-                // نمایش پیام در رابط کاربری
                 if (currentChat && currentChat.id === chatId) {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'message message-received';
-                    
-                    messageElement.innerHTML = `
-                        <div class="message-text">${replyText}</div>
-                        <div class="message-time">${formatTime(replyMessage.timestamp)}</div>
-                    `;
-                    
-                    elements.messagesContainer.appendChild(messageElement);
-                    
-                    // اسکرول به پایین
-                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-                    
-                    // به‌روزرسانی آخرین پیام
+                    addMessageToUI(replyMessage);
                     updateLastMessage(chatId, replyText);
                 }
                 
-            }, 1000 + Math.random() * 2000); // تاخیر 1-3 ثانیه
+            }, 1000 + Math.random() * 2000);
         }
 
         // تولید پاسخ ربات پشتیبانی
@@ -2265,7 +2375,6 @@
                 'اگر مشکل فوری دارید، با شماره ۰۲۱-۱۲۳۴۵۶۷۸ تماس بگیرید.'
             ];
             
-            // پاسخ‌های خاص برای کلمات کلیدی
             if (message.includes('سلام') || message.includes('درود')) {
                 return 'سلام! به پیامرسان سعدی خوش آمدید. چگونه می‌توانم کمک کنم؟';
             } else if (message.includes('تشکر') || message.includes('ممنون')) {
@@ -2371,14 +2480,13 @@
             );
             
             if (existingChat) {
-                // باز کردن چت موجود
                 openChat(existingChat);
                 return;
             }
             
             // ایجاد چت جدید
             const newChat = {
-                id: Date.now(),
+                id: `chat_${Date.now()}`,
                 participants: [currentUser.userid, userid],
                 name: user.username,
                 type: 'user',
@@ -2392,7 +2500,6 @@
             chats.push(newChat);
             storage.set(STORAGE_KEYS.CHATS, chats);
             
-            // باز کردن چت جدید
             openChat(newChat);
         }
 
@@ -2446,8 +2553,6 @@
             storage.set(STORAGE_KEYS.GROUPS, groups);
             
             showMessage('گروه با موفقیت ایجاد شد!', 'success');
-            
-            // بازگشت به لیست چت‌ها
             showChatsList();
             loadChats();
         }
@@ -2494,8 +2599,6 @@
             storage.set(STORAGE_KEYS.CHANNELS, channels);
             
             showMessage('کانال با موفقیت ایجاد شد!', 'success');
-            
-            // بازگشت به لیست چت‌ها
             showChatsList();
             loadChats();
         }
@@ -2640,6 +2743,12 @@
         function handleTyping() {
             if (!currentChat) return;
             
+            // ارسال وضعیت تایپ به سرور
+            socket.emit('user-typing', {
+                chatId: currentChat.id,
+                userId: currentUser.userid
+            });
+            
             // پاک کردن تایماوت قبلی
             if (typingTimeout) {
                 clearTimeout(typingTimeout);
@@ -2647,17 +2756,31 @@
             
             // تنظیم تایماوت جدید
             typingTimeout = setTimeout(() => {
-                // بعد از 1 ثانیه بدون تایپ، وضعیت تایپ کردن پایان می‌یابد
+                socket.emit('user-stop-typing', {
+                    chatId: currentChat.id,
+                    userId: currentUser.userid
+                });
                 isTyping = false;
             }, 1000);
             
             if (!isTyping) {
                 isTyping = true;
-                // در یک برنامه واقعی، اینجا وضعیت "در حال تایپ" به سرور ارسال می‌شود
             }
         }
+
+        // نمایش نشانگر تایپ
+        function showTypingIndicator(userId) {
+            elements.typingIndicator.classList.remove('hidden');
+            elements.statusText.classList.add('hidden');
+        }
+
+        // پنهان کردن نشانگر تایپ
+        function hideTypingIndicator() {
+            elements.typingIndicator.classList.add('hidden');
+            elements.statusText.classList.remove('hidden');
+        }
         
-        // فرمت زمان
+        // فرمت زمان (برای لیست چت‌ها)
         function formatTime(timestamp) {
             const date = new Date(timestamp);
             const now = new Date();
@@ -2680,10 +2803,70 @@
                 return date.toLocaleDateString('fa-IR');
             }
         }
+
+        // فرمت زمان پیام (ساعت دقیق)
+        function formatMessageTime(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
         
         // نمایش/پنهان کردن منو
         function toggleMenu() {
             elements.menuDropdown.classList.toggle('hidden');
+        }
+
+        // حذف پیام
+        function deleteMessage(messageId) {
+            if (confirm('آیا از حذف این پیام مطمئن هستید؟')) {
+                // پیدا کردن پیام
+                const message = messages[currentChat.id]?.find(m => m.id === messageId);
+                if (message && message.sender === currentUser.userid) {
+                    // علامت‌گذاری به عنوان حذف شده
+                    message.isDeleted = true;
+                    message.deletedAt = new Date().toISOString();
+                    
+                    // ذخیره تغییرات
+                    storage.set(STORAGE_KEYS.MESSAGES, messages);
+                    
+                    // ارسال به سرور
+                    socket.emit('delete-message', {
+                        messageId: messageId,
+                        sender: currentUser.userid,
+                        chatId: currentChat.id
+                    });
+                    
+                    // به‌روزرسانی رابط کاربری
+                    deleteMessageInUI(messageId);
+                }
+            }
+        }
+
+        // به‌روزرسانی پیام در UI
+        function updateMessageInUI(messageId, newText, editedAt) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                const textElement = messageElement.querySelector('.message-text');
+                textElement.innerHTML = newText + ' <span style="font-size:10px;color:var(--text-secondary)">(ویرایش شده)</span>';
+                
+                const timeElement = messageElement.querySelector('.message-time');
+                timeElement.innerHTML = `${formatMessageTime(editedAt)} <span class="message-status"><i class="fas fa-check-double"></i></span>`;
+            }
+        }
+
+        // حذف پیام از UI
+        function deleteMessageInUI(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.className = messageElement.className.replace('message-sent', 'message-deleted').replace('message-received', 'message-deleted');
+                messageElement.innerHTML = `
+                    <div class="message-text">این پیام حذف شده است</div>
+                    <div class="message-time">
+                        ${formatMessageTime(new Date().toISOString())}
+                    </div>
+                `;
+            }
         }
 
         // راه‌اندازی برنامه
