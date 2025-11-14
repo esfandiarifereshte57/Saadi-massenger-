@@ -56,14 +56,23 @@
         }
 
         .splash-logo {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin-bottom: 1rem;
-            border-radius: 20px;
+            border-radius: 25px;
             background: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .splash-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            object-fit: cover;
         }
 
         .splash-title {
@@ -94,16 +103,23 @@
         }
 
         .auth-logo {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 1rem;
-            border-radius: 15px;
-            background: var(--primary-color);
+            border-radius: 20px;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 2rem;
+            padding: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            object-fit: cover;
         }
 
         .auth-title {
@@ -435,7 +451,7 @@
     <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
             <div class="splash-logo">
-                <i class="fas fa-comments"></i>
+                <img src="https://cdn.imgurl.ir/uploads/d956431_33BCE89B-2F74-444C-8741-525AC2404090.png" alt="لوگوی پیامرسان سعدی">
             </div>
             <div class="splash-title">پیامرسان سعدی</div>
             <div class="splash-subtitle">Saadi Messenger</div>
@@ -446,7 +462,7 @@
     <div class="auth-container hidden" id="authContainer">
         <div class="auth-header">
             <div class="auth-logo">
-                <i class="fas fa-comments"></i>
+                <img src="https://cdn.imgurl.ir/uploads/d956431_33BCE89B-2F74-444C-8741-525AC2404090.png" alt="لوگوی پیامرسان سعدی">
             </div>
             <div class="auth-title">پیامرسان سعدی</div>
             <div>به پیامرسان امن و سریع خوش آمدید</div>
@@ -490,7 +506,7 @@
             <div id="chatsList">
                 <div class="chat-item" onclick="openChat('support')">
                     <div class="chat-avatar">
-                        <i class="fas fa-user"></i>
+                        <i class="fas fa-headset"></i>
                     </div>
                     <div class="chat-info">
                         <div class="chat-name">پشتیبانی سعدی</div>
@@ -509,6 +525,17 @@
                     </div>
                     <div class="chat-time">۲ دقیقه</div>
                 </div>
+
+                <div class="chat-item" onclick="openChat('admin')">
+                    <div class="chat-avatar">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-name">مدیر سعدی</div>
+                        <div class="chat-last-message">از استفاده از پیامرسان لذت ببرید</div>
+                    </div>
+                    <div class="chat-time">۵ دقیقه</div>
+                </div>
             </div>
 
             <!-- صفحه چت -->
@@ -517,7 +544,7 @@
                     <button class="header-btn" onclick="showChatsList()">
                         <i class="fas fa-arrow-right"></i>
                     </button>
-                    <div class="chat-avatar" style="margin-left: 1rem;">
+                    <div class="chat-avatar" style="margin-left: 1rem;" id="chatAvatar">
                         <i class="fas fa-user"></i>
                     </div>
                     <div style="flex: 1; margin-right: 1rem;">
@@ -569,7 +596,7 @@
                 </button>
             </div>
             <div class="user-profile">
-                <div class="user-avatar">
+                <div class="user-avatar" id="profileAvatar">
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="user-name" id="profileName">کاربر</div>
@@ -604,12 +631,19 @@
                     <div class="help-title">منشن کردن</div>
                     <div class="help-item">• در پیام‌ها می‌توانید با @ کاربران را منشن کنید</div>
                     <div class="help-item">• با کلیک روی آیدی منشن شده، پروفایل کاربر نمایش داده می‌شود</div>
+                    <div class="help-item">• اگر کاربری با آن آیدی وجود نداشته باشد، پیغام خطا نمایش داده می‌شود</div>
                 </div>
                 
                 <div class="help-section">
                     <div class="help-title">مدیریت پیام‌ها</div>
                     <div class="help-item">• برای حذف پیام، روی دکمه حذف در کنار پیام کلیک کنید</div>
                     <div class="help-item">• فقط پیام‌های ارسالی خودتان قابل حذف هستند</div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">مشاهده پروفایل</div>
+                    <div class="help-item">• در محیط چت، روی آیکون اطلاعات (i) کلیک کنید</div>
+                    <div class="help-item">• یا روی آیدی منشن شده در پیام‌ها کلیک کنید</div>
                 </div>
             </div>
         </div>
@@ -621,27 +655,37 @@
             'support': {
                 name: 'پشتیبانی سعدی',
                 userid: '@support',
-                bio: 'تیم پشتیبانی پیامرسان سعدی - برای کمک در خدمت شما هستیم'
+                bio: 'تیم پشتیبانی پیامرسان سعدی - برای کمک در خدمت شما هستیم',
+                avatar: 'headset'
             },
             'guest': {
                 name: 'کاربر مهمان', 
                 userid: '@guest',
-                bio: 'کاربر نمونه پیامرسان سعدی'
+                bio: 'کاربر نمونه پیامرسان سعدی',
+                avatar: 'user'
             },
             'admin': {
                 name: 'مدیر سعدی',
                 userid: '@admin',
-                bio: 'مدیریت پیامرسان سعدی'
+                bio: 'مدیریت پیامرسان سعدی - خوش آمدید به پیامرسان امن و سریع',
+                avatar: 'crown'
             }
         };
 
         const sampleMessages = {
             'support': [
-                { id: 1, text: 'به پیامرسان سعدی خوش آمدید!', sender: 'support', time: '10:00' },
-                { id: 2, text: 'چگونه می‌توانم کمک کنم؟', sender: 'support', time: '10:01' }
+                { id: 1, text: 'به پیامرسان سعدی خوش آمدید! 🎉', sender: 'support', time: '10:00' },
+                { id: 2, text: 'چگونه می‌توانم کمک کنم؟', sender: 'support', time: '10:01' },
+                { id: 3, text: 'شما می‌توانید با @admin نیز در ارتباط باشید', sender: 'support', time: '10:02' }
             ],
             'guest': [
-                { id: 1, text: 'سلام! چطوری؟', sender: 'guest', time: '10:05' }
+                { id: 1, text: 'سلام! چطوری؟', sender: 'guest', time: '10:05' },
+                { id: 2, text: 'این پیامرسان خیلی خوبه! 👍', sender: 'guest', time: '10:06' }
+            ],
+            'admin': [
+                { id: 1, text: 'سلام! به پیامرسان سعدی خوش آمدید', sender: 'admin', time: '09:30' },
+                { id: 2, text: 'از ویژگی‌های جدید مانند منشن کردن لذت ببرید', sender: 'admin', time: '09:31' },
+                { id: 3, text: 'برای پشتیبانی با @support در ارتباط باشید', sender: 'admin', time: '09:32' }
             ]
         };
 
@@ -779,6 +823,10 @@
             document.getElementById('chatWithName').textContent = user.name;
             document.getElementById('chatStatus').textContent = 'آنلاین';
             
+            // تنظیم آواتار چت
+            const chatAvatar = document.getElementById('chatAvatar');
+            chatAvatar.innerHTML = `<i class="fas fa-${user.avatar}"></i>`;
+            
             loadMessages(chatId);
         }
 
@@ -837,7 +885,7 @@
             if (user) {
                 showUserProfileModal(user);
             } else {
-                alert('هیچ حسابی در پیامرسان سعدی، با این مشخصات وجود ندارد.');
+                alert('❌ هیچ حسابی در پیامرسان سعدی، با این مشخصات وجود ندارد.');
             }
         }
 
@@ -881,6 +929,21 @@
                     addMessageToUI(replyMessage, 'support');
                 }, 1000);
             }
+
+            // شبیه‌سازی پاسخ برای ادمین
+            if (currentChat === 'admin') {
+                setTimeout(() => {
+                    const replyMessage = {
+                        id: Date.now() + 1,
+                        text: generateAdminReply(text),
+                        sender: 'admin',
+                        time: new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })
+                    };
+                    
+                    sampleMessages.admin.push(replyMessage);
+                    addMessageToUI(replyMessage, 'admin');
+                }, 1500);
+            }
         }
 
         // تولید پاسخ پشتیبانی
@@ -888,17 +951,37 @@
             const message = userMessage.toLowerCase();
             
             if (message.includes('سلام') || message.includes('درود')) {
-                return 'سلام! چطور می‌تونم کمکتون کنم؟';
+                return 'سلام! چطور می‌تونم کمکتون کنم؟ 😊';
             } else if (message.includes('تشکر') || message.includes('ممنون')) {
-                return 'خوشحالیم که تونستیم کمک کنیم!';
+                return 'خوشحالیم که تونستیم کمک کنیم! 🌟';
             } else if (message.includes('قیمت') || message.includes('هزینه')) {
-                return 'پیامرسان سعدی کاملاً رایگان است!';
+                return 'پیامرسان سعدی کاملاً رایگان است! 💚';
+            } else if (message.includes('مشکل') || message.includes('خطا')) {
+                return 'مشکلتون رو دقیق‌تر描述 کنید تا بتونم کمک کنم.';
             } else {
                 const replies = [
-                    'متشکرم از پیام شما',
+                    'متشکرم از پیام شما 📩',
                     'لطفاً کمی بیشتر توضیح دهید',
                     'تیم پشتیبانی در اسرع وقت پاسخگوی شما خواهد بود',
                     'آیا سوال دیگری دارید؟'
+                ];
+                return replies[Math.floor(Math.random() * replies.length)];
+            }
+        }
+
+        // تولید پاسخ ادمین
+        function generateAdminReply(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('سلام') || message.includes('درود')) {
+                return 'درود! از دیدنتون خوشحالم 👋';
+            } else if (message.includes('ویژگی') || message.includes('قابلیت')) {
+                return 'پیامرسان سعدی دارای قابلیت‌های پیشرفته‌ای مثل منشن و پروفایل کاربری هست ✨';
+            } else {
+                const replies = [
+                    'امیدوارم از پیامرسان لذت ببرید!',
+                    'نظرات شما برای بهبود پیامرسان ارزشمند است',
+                    'برای گزارش مشکل با @support در ارتباط باشید'
                 ];
                 return replies[Math.floor(Math.random() * replies.length)];
             }
@@ -939,6 +1022,10 @@
             document.getElementById('profileName').textContent = user.name;
             document.getElementById('profileUserid').textContent = user.userid;
             document.getElementById('profileBio').textContent = user.bio;
+            
+            // تنظیم آواتار پروفایل
+            const profileAvatar = document.getElementById('profileAvatar');
+            profileAvatar.innerHTML = `<i class="fas fa-${user.avatar}"></i>`;
             
             document.getElementById('profileModal').classList.remove('hidden');
         }
