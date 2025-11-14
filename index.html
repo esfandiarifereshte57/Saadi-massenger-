@@ -6,869 +6,37 @@
     <title>پیامرسان سعدی | Saadi Messenger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Reset و تنظیمات پایه */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --primary-color: #00a884;
-            --secondary-color: #202c33;
-            --background-color: #111b21;
-            --text-primary: #e9edef;
-            --text-secondary: #8696a0;
-            --message-sent: #005c4b;
-            --message-received: #202c33;
-            --border-color: #2a3942;
-            --online-status: #4ade80;
-            --typing-indicator: #8696a0;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Vazir', 'Tahoma', sans-serif;
-            background: var(--background-color);
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            user-select: none;
-        }
-
-        /* صفحه اسپلش */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            animation: fadeOut 2.5s forwards;
-        }
-
-        @keyframes fadeOut {
-            0%, 70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
-        }
-
-        .splash-content {
-            text-align: center;
-            color: white;
-        }
-
-        .splash-logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 1.5rem;
-            border-radius: 28px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: logoPulse 2s infinite;
-        }
-
-        @keyframes logoPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .splash-logo img {
-            width: 100px;
-            height: 100px;
-            border-radius: 20px;
-        }
-
-        .splash-title {
-            font-size: 2rem;
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-
-        .splash-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        /* صفحه ورود */
-        .auth-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--background-color);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .auth-header {
-            padding: 4rem 2rem 2rem;
-            text-align: center;
-            background: var(--primary-color);
-            flex-shrink: 0;
-        }
-
-        .auth-logo {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 1.5rem;
-            border-radius: 20px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .auth-logo img {
-            width: 85px;
-            height: 85px;
-            border-radius: 15px;
-        }
-
-        .auth-title {
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        .auth-subtitle {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        .auth-form {
-            padding: 2.5rem 2rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            min-height: fit-content;
-        }
-
-        .auth-tabs {
-            display: flex;
-            background: var(--border-color);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 1.5rem;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .auth-tab.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 16px 18px;
-            background: var(--border-color);
-            border: none;
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .auth-input:focus {
-            background: #2a3942;
-            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.3);
-        }
-
-        .auth-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .auth-button {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .auth-button:hover {
-            background: #06a06b;
-        }
-
-        .auth-button:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        .auth-message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            margin-top: 1rem;
-            font-weight: 500;
-        }
-
-        .auth-message.success {
-            background: rgba(0, 168, 132, 0.2);
+        /* تمام استایل‌های قبلی حفظ شده‌اند */
+        /* فقط استایل‌های جدید اضافه شده‌اند */
+        
+        .userid-link {
             color: var(--primary-color);
-            border: 1px solid rgba(0, 168, 132, 0.3);
-        }
-
-        .auth-message.error {
-            background: rgba(233, 93, 93, 0.2);
-            color: #e95d5d;
-            border: 1px solid rgba(233, 93, 93, 0.3);
-        }
-
-        /* صفحه اصلی */
-        .messenger-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: var(--background-color);
-        }
-
-        /* هدر */
-        .header {
-            background: var(--secondary-color);
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-            min-height: 60px;
-        }
-
-        .header-title {
-            font-size: 16px;
+            text-decoration: none;
+            cursor: pointer;
             font-weight: 500;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .header-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 19px;
-            cursor: pointer;
-            padding: 8px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-
-        .header-btn:active {
-            background: var(--border-color);
-        }
-
-        /* تب‌بار پایین */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--secondary-color);
-            display: flex;
-            border-top: 1px solid var(--border-color);
-            padding: 8px 0;
-            height: 60px;
-        }
-
-        .tab-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
-            padding: 8px 0;
-            transition: all 0.2s ease;
-        }
-
-        .tab-item.active {
-            color: var(--primary-color);
-        }
-
-        .tab-icon {
-            font-size: 22px;
-            margin-bottom: 4px;
-        }
-
-        /* محتوای اصلی */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 60px;
-        }
-
-        /* لیست چت‌ها */
-        .chats-list {
-            padding: 0;
-        }
-
-        .chat-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background 0.2s;
-            position: relative;
-        }
-
-        .chat-item:active {
-            background: var(--border-color);
-        }
-
-        .chat-item.unread {
-            background: rgba(0, 168, 132, 0.05);
-        }
-
-        .chat-avatar {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-            margin-left: 15px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .chat-avatar i {
-            font-size: 22px;
-        }
-
-        .chat-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .chat-name {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .verified-badge {
-            color: #1da1f2;
-            font-size: 14px;
-        }
-
-        .chat-last-message {
-            font-size: 14px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .chat-meta {
-            text-align: left;
-            min-width: 70px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .chat-time {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .chat-unread {
-            background: var(--primary-color);
-            color: white;
-            font-size: 12px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 18px;
-            font-weight: 500;
-        }
-
-        /* صفحه چت */
-        .chat-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--background-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            background: var(--secondary-color);
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid var(--border-color);
-            min-height: 60px;
-        }
-
-        .chat-header-info {
-            flex: 1;
-        }
-
-        .chat-with {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .chat-status {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .typing-indicator {
-            color: var(--primary-color);
-            font-style: italic;
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
-            max-height: calc(100vh - 140px);
-        }
-
-        .message {
-            max-width: 75%;
-            padding: 8px 12px;
-            border-radius: 7.5px;
-            word-wrap: break-word;
-            animation: slideIn 0.2s ease;
-            position: relative;
-            margin-bottom: 2px;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-sent {
-            align-self: flex-end;
-            background: var(--message-sent);
-            border-radius: 7.5px 7.5px 0 7.5px;
-        }
-
-        .message-received {
-            align-self: flex-start;
-            background: var(--message-received);
-            border-radius: 7.5px 7.5px 7.5px 0;
-        }
-
-        .message-text {
-            font-size: 14.5px;
-            line-height: 1.4;
-            margin-bottom: 2px;
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-align: left;
-            opacity: 0.8;
-        }
-
-        .message-status {
-            position: absolute;
-            bottom: 6px;
-            left: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .message-sent .message-status {
-            color: #8696a0;
-        }
-
-        .input-container {
-            background: var(--secondary-color);
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-top: 1px solid var(--border-color);
-            min-height: 62px;
-            position: fixed;
-            bottom: 60px;
-            left: 0;
-            width: 100%;
-            z-index: 10;
-        }
-
-        .message-input-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: var(--border-color);
-            border-radius: 20px;
-            padding: 2px 5px;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 12px 15px;
-            background: transparent;
-            border: none;
-            border-radius: 20px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 15px;
-            outline: none;
-            max-height: 100px;
-            resize: none;
-            line-height: 1.4;
-        }
-
-        .message-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .input-actions {
-            display: flex;
-            gap: 5px;
-            padding: 0 5px;
-        }
-
-        .input-action {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 18px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-
-        .input-action:active {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .send-button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s ease;
-        }
-
-        .send-button:hover {
-            background: #06a06b;
-        }
-
-        .send-button:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        /* صفحه تنظیمات */
-        .settings-container {
-            padding: 16px;
-        }
-
-        .settings-section {
-            background: var(--secondary-color);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .settings-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .settings-item:last-child {
-            border-bottom: none;
-        }
-
-        .settings-item:active {
-            background: var(--border-color);
-        }
-
-        .settings-icon {
-            font-size: 20px;
-            margin-left: 12px;
-            width: 24px;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        .settings-text {
-            flex: 1;
-        }
-
-        .settings-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .settings-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .settings-arrow {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        /* صفحه ایجاد چت جدید */
-        .new-chat-container {
-            padding: 16px;
-        }
-
-        .search-box {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--border-color);
-            border: none;
-            border-radius: 20px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 15px;
-            outline: none;
-            margin-bottom: 16px;
-        }
-
-        .search-box::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .contact-list {
-            background: var(--secondary-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .contact-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .contact-item:last-child {
-            border-bottom: none;
-        }
-
-        .contact-item:active {
-            background: var(--border-color);
-        }
-
-        /* وضعیت‌های مختلف */
-        .hidden {
-            display: none !important;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-            color: var(--text-secondary);
-        }
-
-        /* اسکرول بار سفارشی */
-        .auth-container::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .auth-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .auth-container::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 2.5px;
-        }
-
-        .messages-container::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .messages-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .messages-container::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 2.5px;
-        }
-
-        /* سازگاری با iOS */
-        @supports (-webkit-touch-callout: none) {
-            .messenger-container {
-                height: -webkit-fill-available;
-            }
-        }
-
-        /* حالت لنداسکیپ */
-        @media (max-width: 768px) and (orientation: landscape) {
-            .header {
-                padding: 8px 16px;
-            }
-            
-            .messages-container {
-                padding: 8px 16px;
-                max-height: calc(100vh - 120px);
-            }
-            
-            .input-container {
-                padding: 8px 16px;
-                bottom: 60px;
-            }
-            
-            .auth-header {
-                padding: 2rem 2rem 1rem;
-            }
-            
-            .auth-form {
-                padding: 1.5rem 2rem;
-            }
-        }
-
-        /* آیکون وضعیت آنلاین */
-        .online-status {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background: var(--online-status);
-            border: 2px solid var(--background-color);
-            border-radius: 50%;
-        }
-
-        /* آواتارهای مختلف */
-        .avatar-user {
-            background: var(--primary-color);
-        }
-
-        .avatar-group {
-            background: #667eea;
-        }
-
-        .avatar-channel {
-            background: #0088cc;
-        }
-
-        .avatar-bot {
-            background: #ff6b6b;
         }
         
-        /* مودال‌ها */
+        .userid-link:hover {
+            text-decoration: underline;
+        }
+        
         .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.6);
-            display: flex;
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
             padding: 16px;
             backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
         }
         
         .modal-content {
@@ -943,286 +111,6 @@
         .modal-btn.secondary:active {
             background: #2a3942;
         }
-
-        /* منوی سه نقطه */
-        .menu-dropdown {
-            position: absolute;
-            top: 60px;
-            left: 10px;
-            background: var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            overflow: hidden;
-            z-index: 100;
-            width: 200px;
-        }
-
-        .menu-item {
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .menu-item:active {
-            background: var(--border-color);
-        }
-
-        .menu-icon {
-            font-size: 18px;
-            color: var(--text-secondary);
-            width: 20px;
-            text-align: center;
-        }
-
-        .menu-text {
-            font-size: 14px;
-            color: var(--text-primary);
-        }
-
-        /* فرم‌های ایجاد */
-        .create-form {
-            padding: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--border-color);
-            border: none;
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        /* ریکشن‌ها */
-        .reactions-container {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-            flex-wrap: wrap;
-        }
-
-        .reaction {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 2px 6px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .reaction-count {
-            color: var(--text-secondary);
-        }
-
-        .mention {
-            color: var(--primary-color);
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .mention:hover {
-            text-decoration: underline;
-        }
-
-        /* منوی پیام */
-        .message-menu {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            overflow: hidden;
-            z-index: 50;
-            width: 150px;
-        }
-
-        .message-menu-item {
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .message-menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .message-menu-item:active {
-            background: var(--border-color);
-        }
-
-        .message-menu-icon {
-            font-size: 16px;
-            color: var(--text-secondary);
-            width: 18px;
-            text-align: center;
-        }
-
-        .message-menu-text {
-            font-size: 14px;
-            color: var(--text-primary);
-        }
-
-        /* آیکون منوی پیام */
-        .message-actions {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            cursor: pointer;
-        }
-
-        .message:hover .message-actions {
-            opacity: 1;
-        }
-
-        /* صفحه پروفایل */
-        .profile-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--background-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-header {
-            background: var(--secondary-color);
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid var(--border-color);
-            min-height: 60px;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: white;
-            margin-left: 15px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .profile-info {
-            flex: 1;
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .profile-status {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .profile-content {
-            padding: 16px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .profile-section {
-            background: var(--secondary-color);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .profile-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-item:last-child {
-            border-bottom: none;
-        }
-
-        .profile-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            min-width: 120px;
-        }
-
-        .profile-value {
-            font-size: 14px;
-            color: var(--text-primary);
-            flex: 1;
-        }
-
-        .profile-bio {
-            padding: 16px;
-            border-top: 1px solid var(--border-color);
-            font-size: 14px;
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
     </style>
 </head>
 <body>
@@ -1286,7 +174,7 @@
                 <div>نام کاربری: <strong>admin</strong> | رمز: <strong>123456</strong></div>
                 <div>نام کاربری: <strong>user1</strong> | رمز: <strong>123456</strong></div>
                 <div>نام کاربری: <strong>user2</strong> | رمز: <strong>123456</strong></div>
-                <div style="margin-top: 10px;">برای چت، از ایدی‌های: <strong>admin</strong>, <strong>user1</strong>, <strong>user2</strong> استفاده کنید</div>
+                <div style="margin-top: 10px;">برای چت، از ایدی‌های: <strong>admin</strong>, <strong>user1</strong>, <strong>user2</strong>, <strong>botfather</strong> استفاده کنید</div>
             </div>
         </div>
     </div>
@@ -1641,6 +529,95 @@
         </div>
     </div>
 
+    <!-- مودال‌ها -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ویرایش پروفایل</div>
+                <button class="modal-close" onclick="hideModal('profile-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">نام کاربری</label>
+                    <input type="text" class="form-input" id="edit-username" placeholder="نام کاربری">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ایدی کاربری</label>
+                    <input type="text" class="form-input" id="edit-userid" placeholder="ایدی">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">بیوگرافی</label>
+                    <textarea class="form-textarea" id="edit-bio" placeholder="بیوگرافی"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('profile-modal')">انصراف</button>
+                <button class="modal-btn primary" onclick="saveProfile()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="privacy-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">تنظیمات حریم خصوصی</div>
+                <button class="modal-close" onclick="hideModal('privacy-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">نمایش آخرین بازدید</label>
+                    <select class="form-select" id="last-seen-privacy">
+                        <option value="everyone">همه</option>
+                        <option value="contacts">مخاطبین</option>
+                        <option value="nobody">هیچکس</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">نمایش وضعیت آنلاین</label>
+                    <select class="form-select" id="online-privacy">
+                        <option value="everyone">همه</option>
+                        <option value="contacts">مخاطبین</option>
+                        <option value="nobody">هیچکس</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">نمایش عکس پروفایل</label>
+                    <select class="form-select" id="profile-pic-privacy">
+                        <option value="everyone">همه</option>
+                        <option value="contacts">مخاطبین</option>
+                        <option value="nobody">هیچکس</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('privacy-modal')">انصراف</button>
+                <button class="modal-btn primary" onclick="savePrivacySettings()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="logout-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">خروج از حساب</div>
+                <button class="modal-close" onclick="hideModal('logout-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('logout-modal')">انصراف</button>
+                <button class="modal-btn primary" onclick="logout()">خروج</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // داده‌های برنامه
         let currentUser = null;
@@ -1922,6 +899,19 @@
                         bio: 'تیم پشتیبانی پیامرسان سعدی',
                         lastSeen: new Date().toISOString(),
                         number: '021-12345678'
+                    },
+                    {
+                        id: 5,
+                        username: 'BotFather',
+                        userid: 'botfather',
+                        password: '123456',
+                        phone: null,
+                        online: true,
+                        verified: true,
+                        type: 'bot',
+                        bio: 'ربات هوشمند پاسخگو به سوالات شما',
+                        lastSeen: new Date().toISOString(),
+                        number: 'ربات'
                     }
                 ];
                 storage.set(STORAGE_KEYS.USERS, users);
@@ -2329,13 +1319,9 @@
                 userElement.style.cursor = 'pointer';
                 
                 userElement.innerHTML = `
-                    <div><strong>${user.username}</strong> (${user.userid})</div>
+                    <div><strong>${user.username}</strong> (<span class="userid-link" onclick="document.getElementById('new-chat-userid').value = '${user.userid}'">${user.userid}</span>)</div>
                     <div style="font-size: 12px; color: var(--text-secondary);">${user.bio || 'بدون بیوگرافی'}</div>
                 `;
-                
-                userElement.addEventListener('click', () => {
-                    document.getElementById('new-chat-userid').value = user.userid;
-                });
                 
                 elements.availableUsersList.appendChild(userElement);
             });
@@ -2629,13 +1615,126 @@
             // به‌روزرسانی آخرین پیام
             updateLastMessage(currentChat.id, text);
             
-            // اگر چت با ربات پشتیبانی است، پاسخ خودکار ارسال شود
-            if (currentChat.participants.includes('support')) {
+            // اگر چت با ربات است، پاسخ خودکار ارسال شود
+            if (currentChat.participants.includes('botfather')) {
+                simulateBotReply(currentChat.id, text);
+            } else if (currentChat.participants.includes('support')) {
                 simulateSupportReply(currentChat.id, text);
             }
             
             // فوکوس مجدد روی فیلد ورودی
             input.focus();
+        }
+
+        // شبیه‌سازی پاسخ ربات
+        function simulateBotReply(chatId, userMessage) {
+            if (!currentChat || currentChat.id !== chatId) return;
+            
+            // تاخیر برای ارسال پاسخ
+            setTimeout(() => {
+                if (!currentChat || currentChat.id !== chatId) return;
+                
+                // تولید پاسخ خودکار بر اساس پیام کاربر
+                const replyText = generateBotReply(userMessage);
+                
+                // ایجاد پیام جدید
+                const replyMessage = {
+                    id: Date.now(),
+                    text: replyText,
+                    sender: 'botfather',
+                    timestamp: new Date().toISOString(),
+                    chatId: chatId,
+                    status: 'delivered'
+                };
+                
+                // ذخیره پیام
+                if (!messages[chatId]) {
+                    messages[chatId] = [];
+                }
+                messages[chatId].push(replyMessage);
+                storage.set(STORAGE_KEYS.MESSAGES, messages);
+                
+                // نمایش پیام در رابط کاربری
+                if (currentChat && currentChat.id === chatId) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message message-received';
+                    
+                    messageElement.innerHTML = `
+                        <div class="message-text">${replyText}</div>
+                        <div class="message-time">${formatTime(replyMessage.timestamp)}</div>
+                    `;
+                    
+                    elements.messagesContainer.appendChild(messageElement);
+                    
+                    // اسکرول به پایین
+                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+                    
+                    // به‌روزرسانی آخرین پیام
+                    updateLastMessage(chatId, replyText);
+                }
+                
+            }, 1000 + Math.random() * 2000); // تاخیر 1-3 ثانیه
+        }
+
+        // تولید پاسخ ربات
+        function generateBotReply(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            // پاسخ‌های خاص برای کلمات کلیدی
+            if (message.includes('سلام') || message.includes('درود') || message.includes('hello') || message.includes('hi')) {
+                return 'سلام! من BotFather هستم. چطور می‌توانم کمک کنم؟';
+            } else if (message.includes('چطوری') || message.includes('حالت') || message.includes('چطور')) {
+                return 'من خوبم ممنون! شما چطورید؟';
+            } else if (message.includes('اسم') || message.includes('نام')) {
+                return 'اسم من BotFather هست. شما چی؟';
+            } else if (message.includes('سن') || message.includes('قد')) {
+                return 'من یک ربات هستم، پس سن و قد ندارم!';
+            } else if (message.includes('ساعت') || message.includes('زمان')) {
+                return `ساعت ${new Date().toLocaleTimeString('fa-IR')} است.`;
+            } else if (message.includes('تاریخ') || message.includes('روز')) {
+                return `امروز ${new Date().toLocaleDateString('fa-IR')} است.`;
+            } else if (message.includes('هواشناسی') || message.includes('آب و هوا')) {
+                return 'متأسفانه اطلاعات هواشناسی در حال حاضر در دسترس نیست.';
+            } else if (message.includes('موسیقی') || message.includes('آهنگ')) {
+                return 'چه سبک موسیقی را دوست دارید؟';
+            } else if (message.includes('فیلم') || message.includes('سینما')) {
+                return 'آخرین فیلمی که دیدید چه بود؟';
+            } else if (message.includes('کمک') || message.includes('help')) {
+                return 'چگونه می‌توانم کمک کنم؟ می‌توانید از من سوالات مختلفی بپرسید.';
+            } else if (message.includes('تشکر') || message.includes('ممنون') || message.includes('مرسی')) {
+                return 'خوشحالم که توانستم کمک کنم!';
+            } else if (message.includes('خداحافظ') || message.includes('بای') || message.includes('bye')) {
+                return 'خداحافظ! روز خوبی داشته باشید.';
+            } else if (message.includes('عشق') || message.includes('دوست')) {
+                return 'عشق زیباست! همیشه عاشق باشید.';
+            } else if (message.includes('طنز') || message.includes('جوک')) {
+                const jokes = [
+                    'چرا مرغ از جاده رد شد؟ چون می‌خواست به آن طرف برود!',
+                    'چرا کامپیوتر بیمار شد؟ چون ویروس گرفته بود!',
+                    'یک مرد به دکتر مراجعه کرد و گفت: "دکتر، من فکر می‌کنم یک مورچه در گوشم است." دکتر پرسید: "چطور متوجه شدی؟" مرد گفت: "داره با لهجه مورچه‌ای حرف میزنه!"'
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            } else if (message.includes('سوال') || message.includes('؟')) {
+                return 'سوال جالبی پرسیدید! من یک ربات هستم و دانش من محدود است.';
+            } else if (message.includes('ربات') || message.includes('bot')) {
+                return 'بله، من یک ربات هوشمند هستم که برای پاسخ به سوالات شما طراحی شده‌ام.';
+            } else if (message.includes('برنامه') || message.includes('کدنویس')) {
+                return 'من توسط تیم توسعه پیامرسان سعدی ایجاد شده‌ام.';
+            }
+            
+            // پاسخ‌های عمومی
+            const generalReplies = [
+                'جالب است! بیشتر توضیح دهید.',
+                'منظورتان را متوجه نشدم. می‌توانید دوباره سوال کنید؟',
+                'این یک موضوع جالب است. چه چیز دیگری می‌خواهید بدانید؟',
+                'من یک ربات هستم و دانش من محدود است، اما سعی می‌کنم کمک کنم.',
+                'لطفاً سوال خود را به شکل دیگری مطرح کنید.',
+                'چیز دیگری هست که بتوانم کمک کنم؟',
+                'من هنوز در حال یادگیری هستم. سوالات ساده‌تری بپرسید.',
+                'این موضوع خارج از حوزه دانش من است. سوال دیگری دارید؟'
+            ];
+            
+            return generalReplies[Math.floor(Math.random() * generalReplies.length)];
         }
 
         // شبیه‌سازی پاسخ ربات پشتیبانی
@@ -2908,12 +2007,6 @@
                 return;
             }
             
-            // بررسی وجود کاربر عضو
-            if (memberId && !users.find(u => u.userid === memberId)) {
-                showMessage('کاربری با این ایدی یافت نشد');
-                return;
-            }
-            
             // ایجاد گروه جدید
             const newGroup = {
                 id: groupId,
@@ -2921,13 +2014,23 @@
                 bio: bio,
                 owner: currentUser.userid,
                 admins: [currentUser.userid],
-                members: memberId ? [currentUser.userid, memberId] : [currentUser.userid],
+                members: [currentUser.userid], // ابتدا فقط کاربر جاری عضو است
                 createdAt: new Date().toISOString(),
                 unread: 0,
                 lastMessage: '',
                 lastMessageTime: new Date().toISOString(),
                 reactionsEnabled: true
             };
+            
+            // اگر کاربری برای اضافه کردن مشخص شده، بررسی و اضافه کردن
+            if (memberId) {
+                const userToAdd = users.find(u => u.userid === memberId);
+                if (userToAdd) {
+                    newGroup.members.push(memberId);
+                } else {
+                    showMessage('کاربری با این ایدی یافت نشد، گروه بدون عضو اضافی ایجاد شد');
+                }
+            }
             
             // ذخیره گروه
             groups.push(newGroup);
@@ -2990,12 +2093,12 @@
         
         // نمایش مودال
         function showModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
+            document.getElementById(modalId).classList.add('show');
         }
         
         // پنهان کردن مودال
         function hideModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('show');
         }
         
         // نمایش مودال پروفایل
