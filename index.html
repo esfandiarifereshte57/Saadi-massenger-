@@ -500,6 +500,8 @@
             flex-direction: column;
             gap: 2px;
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
+            /* ارتفاع پیام‌ها را تنظیم می‌کنیم تا جای تایپ کردن دیده شود */
+            max-height: calc(100vh - 140px);
         }
 
         .message {
@@ -562,6 +564,12 @@
             gap: 12px;
             border-top: 1px solid var(--border-color);
             min-height: 62px;
+            /* این قسمت را در پایین ثابت می‌کنیم */
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            z-index: 10;
         }
 
         .message-input-container {
@@ -786,10 +794,12 @@
             
             .messages-container {
                 padding: 8px 16px;
+                max-height: calc(100vh - 120px);
             }
             
             .input-container {
                 padding: 8px 16px;
+                bottom: 60px;
             }
         }
 
@@ -1622,6 +1632,14 @@
                     elements.menuDropdown.classList.add('hidden');
                 }
             });
+            
+            // فوکوس روی فیلد ورودی پیام هنگام باز کردن چت
+            document.getElementById('message-input').addEventListener('focus', function() {
+                // اسکرول به پایین هنگام فوکوس روی فیلد ورودی
+                setTimeout(() => {
+                    elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+                }, 100);
+            });
         }
 
         // تنظیم ارتفاع خودکار برای textarea
@@ -2054,6 +2072,11 @@
                 
                 loadChats();
             }
+            
+            // فوکوس روی فیلد ورودی پیام
+            setTimeout(() => {
+                elements.messageInput.focus();
+            }, 300);
         }
 
         // دریافت وضعیت چت
@@ -2173,6 +2196,9 @@
             if (currentChat.participants.includes('@support')) {
                 simulateSupportReply(currentChat.id, text);
             }
+            
+            // فوکوس مجدد روی فیلد ورودی
+            input.focus();
         }
 
         // شبیه‌سازی پاسخ ربات پشتیبانی
