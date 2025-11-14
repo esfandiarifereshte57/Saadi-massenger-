@@ -13,74 +13,23 @@ const io = socketIo(server, {
     }
 });
 
+// میدلور
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// ذخیره پیام‌ها در سرور
-let messages = {};
-
+// route اصلی
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// socket.io برای چت real-time
 io.on('connection', (socket) => {
     console.log('کاربر متصل شد:', socket.id);
 
-    // ارسال پیام
     socket.on('send-message', (data) => {
-        if (!messages[data.chatId]) {
-            messages[data.chatId] = [];
-        }
-        
-        const message = {
-            id: Date.now(),
-            text: data.text,
-            sender: data.sender,
-            timestamp: new Date().toISOString(),
-            chatId: data.chatId,
-            status: 'delivered',
-            isEdited: false,
-            isDeleted: false
-        };
-        
-        messages[data.chatId].push(message);
-        io.emit('receive-message', message);
-    });
-
-    // ویرایش پیام
-    socket.on('edit-message', (data) => {
-        if (messages[data.chatId]) {
-            const messageIndex = messages[data.chatId].findIndex(m => m.id === data.messageId);
-            if (messageIndex !== -1 && messages[data.chatId][messageIndex].sender === data.sender) {
-                messages[data.chatId][messageIndex].text = data.newText;
-                messages[data.chatId][messageIndex].isEdited = true;
-                messages[data.chatId][messageIndex].editedAt = new Date().toISOString();
-                
-                io.emit('message-edited', {
-                    messageId: data.messageId,
-                    newText: data.newText,
-                    chatId: data.chatId,
-                    editedAt: messages[data.chatId][messageIndex].editedAt
-                });
-            }
-        }
-    });
-
-    // حذف پیام
-    socket.on('delete-message', (data) => {
-        if (messages[data.chatId]) {
-            const messageIndex = messages[data.chatId].findIndex(m => m.id === data.messageId);
-            if (messageIndex !== -1 && messages[data.chatId][messageIndex].sender === data.sender) {
-                messages[data.chatId][messageIndex].isDeleted = true;
-                messages[data.chatId][messageIndex].deletedAt = new Date().toISOString();
-                
-                io.emit('message-deleted', {
-                    messageId: data.messageId,
-                    chatId: data.chatId
-                });
-            }
-        }
+        console.log('پیام دریافت شد:', data);
+        io.emit('receive-message', data);
     });
 
     socket.on('disconnect', () => {
@@ -88,7 +37,9 @@ io.on('connection', (socket) => {
     });
 });
 
+// اجرای سرور
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`سرور پیامرسان سعدی روی پورت ${PORT} اجرا شد`);
+    console.log(`✅ سرور پیامرسان سعدی روی پورت ${PORT} اجرا شد`);
+    console.log(`🌐 آدرس: http://localhost:${PORT}`);
 });
