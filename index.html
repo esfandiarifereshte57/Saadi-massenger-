@@ -910,6 +910,121 @@
         .modal-btn.secondary:active {
             background: #2a3942;
         }
+
+        /* منوی سه نقطه */
+        .menu-dropdown {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 100;
+            width: 200px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:active {
+            background: var(--border-color);
+        }
+
+        .menu-icon {
+            font-size: 18px;
+            color: var(--text-secondary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* فرم‌های ایجاد */
+        .create-form {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* ریکشن‌ها */
+        .reactions-container {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        .reaction {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .reaction-count {
+            color: var(--text-secondary);
+        }
+
+        .mention {
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .mention:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -973,6 +1088,28 @@
             </div>
         </div>
 
+        <!-- منوی سه نقطه -->
+        <div class="menu-dropdown hidden" id="menu-dropdown">
+            <div class="menu-item" id="new-chat-menu">
+                <div class="menu-icon">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="menu-text">شروع چت جدید</div>
+            </div>
+            <div class="menu-item" id="create-group-menu">
+                <div class="menu-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="menu-text">ایجاد گروه</div>
+            </div>
+            <div class="menu-item" id="create-channel-menu">
+                <div class="menu-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="menu-text">ایجاد کانال</div>
+            </div>
+        </div>
+
         <!-- محتوای اصلی -->
         <div class="main-content" id="main-content">
             <!-- لیست چت‌ها -->
@@ -982,7 +1119,7 @@
                         <i class="fas fa-comments"></i>
                     </div>
                     <div>هنوز چتی ندارید</div>
-                    <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه + کلیک کنید</div>
+                    <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه ⋮ کلیک کنید</div>
                 </div>
             </div>
 
@@ -1141,9 +1278,57 @@
 
             <!-- صفحه ایجاد چت جدید -->
             <div class="new-chat-container hidden" id="new-chat-container">
-                <input type="text" class="search-box" placeholder="جستجو در مخاطبین...">
-                <div class="contact-list" id="contact-list">
-                    <!-- لیست مخاطبین -->
+                <div class="form-group">
+                    <label class="form-label">ایدی کاربر مقابل</label>
+                    <input type="text" class="form-input" id="new-chat-userid" placeholder="@userid">
+                </div>
+                <div class="form-actions">
+                    <button class="modal-btn secondary" id="cancel-new-chat">انصراف</button>
+                    <button class="modal-btn primary" id="start-new-chat">شروع چت</button>
+                </div>
+            </div>
+
+            <!-- صفحه ایجاد گروه -->
+            <div class="create-form hidden" id="create-group-container">
+                <div class="form-group">
+                    <label class="form-label">نام گروه</label>
+                    <input type="text" class="form-input" id="group-name" placeholder="نام گروه">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ایدی گروه</label>
+                    <input type="text" class="form-input" id="group-id" placeholder="@groupid">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">بیوگرافی گروه</label>
+                    <textarea class="form-textarea" id="group-bio" placeholder="توضیحاتی درباره گروه"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">عضو اول (ایدی کاربری)</label>
+                    <input type="text" class="form-input" id="group-member" placeholder="@userid">
+                </div>
+                <div class="form-actions">
+                    <button class="modal-btn secondary" id="cancel-create-group">انصراف</button>
+                    <button class="modal-btn primary" id="create-group">ایجاد گروه</button>
+                </div>
+            </div>
+
+            <!-- صفحه ایجاد کانال -->
+            <div class="create-form hidden" id="create-channel-container">
+                <div class="form-group">
+                    <label class="form-label">نام کانال</label>
+                    <input type="text" class="form-input" id="channel-name" placeholder="نام کانال">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ایدی کانال</label>
+                    <input type="text" class="form-input" id="channel-id" placeholder="@channelid">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">بیوگرافی کانال</label>
+                    <textarea class="form-textarea" id="channel-bio" placeholder="توضیحاتی درباره کانال"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="modal-btn secondary" id="cancel-create-channel">انصراف</button>
+                    <button class="modal-btn primary" id="create-channel">ایجاد کانال</button>
                 </div>
             </div>
         </div>
@@ -1256,8 +1441,9 @@
         let currentChat = null;
         let chats = [];
         let messages = {};
-        let contacts = [];
         let users = [];
+        let groups = [];
+        let channels = [];
         let isTyping = false;
         let typingTimeout = null;
 
@@ -1266,7 +1452,9 @@
             USERS: 'saadi_messenger_users',
             CHATS: 'saadi_messenger_chats',
             MESSAGES: 'saadi_messenger_messages',
-            CURRENT_USER: 'saadi_messenger_current_user'
+            CURRENT_USER: 'saadi_messenger_current_user',
+            GROUPS: 'saadi_messenger_groups',
+            CHANNELS: 'saadi_messenger_channels'
         };
 
         // المان‌های DOM
@@ -1282,11 +1470,10 @@
             messagesContainer: document.getElementById('messages-container'),
             settingsContainer: document.getElementById('settings-container'),
             newChatContainer: document.getElementById('new-chat-container'),
+            createGroupContainer: document.getElementById('create-group-container'),
+            createChannelContainer: document.getElementById('create-channel-container'),
             mainContent: document.getElementById('main-content'),
-            contactList: document.getElementById('contact-list'),
-            profileModal: document.getElementById('profile-modal'),
-            privacyModal: document.getElementById('privacy-modal'),
-            logoutModal: document.getElementById('logout-modal'),
+            menuDropdown: document.getElementById('menu-dropdown'),
             messageInput: document.getElementById('message-input'),
             typingIndicator: document.getElementById('typing-indicator'),
             statusText: document.getElementById('status-text')
@@ -1375,7 +1562,12 @@
             document.getElementById('message-input').addEventListener('input', handleTyping);
             
             // رویداد منو
-            document.getElementById('menu-btn').addEventListener('click', showNewChat);
+            document.getElementById('menu-btn').addEventListener('click', toggleMenu);
+            
+            // رویدادهای منو
+            document.getElementById('new-chat-menu').addEventListener('click', showNewChatForm);
+            document.getElementById('create-group-menu').addEventListener('click', showCreateGroupForm);
+            document.getElementById('create-channel-menu').addEventListener('click', showCreateChannelForm);
             
             // رویداد جستجو
             document.getElementById('search-btn').addEventListener('click', showSearch);
@@ -1400,8 +1592,15 @@
             document.getElementById('cancel-logout').addEventListener('click', () => hideModal('logout-modal'));
             document.getElementById('confirm-logout').addEventListener('click', logout);
             
-            // رویداد جستجو در مخاطبین
-            document.querySelector('.search-box').addEventListener('input', filterContacts);
+            // رویدادهای فرم‌های ایجاد
+            document.getElementById('cancel-new-chat').addEventListener('click', showChatsList);
+            document.getElementById('start-new-chat').addEventListener('click', startNewChat);
+            
+            document.getElementById('cancel-create-group').addEventListener('click', showChatsList);
+            document.getElementById('create-group').addEventListener('click', createGroup);
+            
+            document.getElementById('cancel-create-channel').addEventListener('click', showChatsList);
+            document.getElementById('create-channel').addEventListener('click', createChannel);
             
             // رویدادهای دکمه‌های چت
             document.getElementById('voice-call-btn').addEventListener('click', () => showMessage('تماس صوتی به زودی اضافه خواهد شد'));
@@ -1413,6 +1612,13 @@
             
             // تنظیم ارتفاع خودکار برای فیلد ورودی پیام
             setupAutoResizeTextarea();
+            
+            // بستن منو با کلیک خارج از آن
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.header-btn') && !e.target.closest('.menu-dropdown')) {
+                    elements.menuDropdown.classList.add('hidden');
+                }
+            });
         }
 
         // تنظیم ارتفاع خودکار برای textarea
@@ -1429,6 +1635,8 @@
             users = storage.get(STORAGE_KEYS.USERS) || [];
             chats = storage.get(STORAGE_KEYS.CHATS) || [];
             messages = storage.get(STORAGE_KEYS.MESSAGES) || {};
+            groups = storage.get(STORAGE_KEYS.GROUPS) || [];
+            channels = storage.get(STORAGE_KEYS.CHANNELS) || [];
             currentUser = storage.get(STORAGE_KEYS.CURRENT_USER);
             
             // اگر کاربران خالی هستند، چند کاربر نمونه اضافه کنید
@@ -1436,113 +1644,18 @@
                 users = [
                     {
                         id: 1,
-                        username: 'کاربر نمونه',
-                        userid: '@user1',
+                        username: 'مدیر سعدی',
+                        userid: '@admin',
                         password: '123456',
                         online: true,
                         verified: true,
                         type: 'user',
-                        bio: 'این یک کاربر نمونه است',
-                        lastSeen: new Date().toISOString()
-                    },
-                    {
-                        id: 2,
-                        username: 'دوست خوبم',
-                        userid: '@user2',
-                        password: '123456',
-                        online: false,
-                        verified: false,
-                        type: 'user',
-                        bio: 'دوست خوب شما',
-                        lastSeen: new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 دقیقه پیش
-                    },
-                    {
-                        id: 3,
-                        username: 'گروه خانواده',
-                        userid: '@group1',
-                        password: '123456',
-                        online: true,
-                        verified: true,
-                        type: 'group',
-                        bio: 'گروه خانوادگی ما',
-                        lastSeen: new Date().toISOString()
-                    },
-                    {
-                        id: 4,
-                        username: 'ربات پشتیبانی',
-                        userid: '@bot1',
-                        password: '123456',
-                        online: true,
-                        verified: true,
-                        type: 'bot',
-                        bio: 'ربات پشتیبانی پیامرسان سعدی',
+                        bio: 'مدیر پیامرسان سعدی',
                         lastSeen: new Date().toISOString()
                     }
                 ];
                 storage.set(STORAGE_KEYS.USERS, users);
             }
-            
-            // ایجاد مخاطبین (همه کاربران به جز کاربر جاری)
-            updateContacts();
-        }
-
-        // به‌روزرسانی لیست مخاطبین
-        function updateContacts() {
-            contacts = users.filter(user => 
-                !currentUser || user.userid !== currentUser.userid
-            );
-            renderContacts();
-        }
-
-        // نمایش مخاطبین
-        function renderContacts() {
-            elements.contactList.innerHTML = '';
-            
-            if (contacts.length === 0) {
-                elements.contactList.innerHTML = `
-                    <div class="empty-state" style="padding: 2rem;">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div>هیچ مخاطبی یافت نشد</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            contacts.forEach(contact => {
-                const contactElement = document.createElement('div');
-                contactElement.className = 'contact-item';
-                contactElement.setAttribute('data-userid', contact.userid);
-                
-                let avatarClass = 'avatar-user';
-                let avatarIcon = 'fas fa-user';
-                
-                if (contact.type === 'group') {
-                    avatarClass = 'avatar-group';
-                    avatarIcon = 'fas fa-users';
-                } else if (contact.type === 'bot') {
-                    avatarClass = 'avatar-bot';
-                    avatarIcon = 'fas fa-robot';
-                }
-                
-                contactElement.innerHTML = `
-                    <div class="chat-avatar ${avatarClass}">
-                        <i class="${avatarIcon}"></i>
-                        ${contact.online ? '<div class="online-status"></div>' : ''}
-                    </div>
-                    <div class="chat-info">
-                        <div class="chat-name">
-                            ${contact.username}
-                            ${contact.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
-                        </div>
-                        <div class="chat-last-message">${contact.bio || 'بدون توضیح'}</div>
-                    </div>
-                `;
-                
-                contactElement.addEventListener('click', () => startNewChat(contact.userid));
-                elements.contactList.appendChild(contactElement);
-            });
         }
 
         // نمایش صفحه ورود
@@ -1556,7 +1669,6 @@
             elements.auth.classList.add('hidden');
             elements.messenger.classList.remove('hidden');
             loadChats();
-            updateContacts();
         }
 
         // تغییر تب ورود/ثبت‌نام
@@ -1586,7 +1698,7 @@
         
         // نمایش پیام در برنامه
         function showMessage(message, type = 'info') {
-            alert(message); // در نسخه واقعی می‌توانید از یک سیستم اعلان بهتر استفاده کنید
+            alert(message);
         }
 
         // ورود به سیستم
@@ -1697,6 +1809,8 @@
             elements.chatContainer.classList.add('hidden');
             elements.settingsContainer.classList.add('hidden');
             elements.newChatContainer.classList.add('hidden');
+            elements.createGroupContainer.classList.add('hidden');
+            elements.createChannelContainer.classList.add('hidden');
             
             // نمایش بخش انتخاب شده
             switch(tabName) {
@@ -1723,8 +1837,31 @@
 
         // بارگذاری چت‌ها
         function loadChats() {
+            // ترکیب تمام چت‌ها، گروه‌ها و کانال‌ها
+            const allChats = [
+                ...chats,
+                ...groups.map(group => ({
+                    id: group.id,
+                    name: group.name,
+                    type: 'group',
+                    participants: group.members,
+                    lastMessage: group.lastMessage || '',
+                    lastMessageTime: group.lastMessageTime || new Date().toISOString(),
+                    unread: group.unread || 0
+                })),
+                ...channels.map(channel => ({
+                    id: channel.id,
+                    name: channel.name,
+                    type: 'channel',
+                    participants: channel.members,
+                    lastMessage: channel.lastMessage || '',
+                    lastMessageTime: channel.lastMessageTime || new Date().toISOString(),
+                    unread: channel.unread || 0
+                }))
+            ];
+            
             // فیلتر کردن چت‌های مربوط به کاربر جاری
-            const userChats = chats.filter(chat => 
+            const userChats = allChats.filter(chat => 
                 chat.participants && chat.participants.includes(currentUser.userid)
             );
             
@@ -1737,7 +1874,7 @@
                             <i class="fas fa-comments"></i>
                         </div>
                         <div>هنوز چتی ندارید</div>
-                        <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه + کلیک کنید</div>
+                        <div style="font-size: 14px; margin-top: 8px;">برای شروع چت جدید، روی دکمه ⋮ کلیک کنید</div>
                     </div>
                 `;
                 return;
@@ -1747,43 +1884,31 @@
                 const chatElement = document.createElement('div');
                 chatElement.className = `chat-item ${chat.unread > 0 ? 'unread' : ''}`;
                 
-                // پیدا کردن اطلاعات مخاطب
-                const otherParticipant = chat.participants.find(p => p !== currentUser.userid);
-                const contact = users.find(u => u.userid === otherParticipant);
-                
-                if (!contact) return;
-                
                 let avatarClass = 'avatar-user';
                 let avatarIcon = 'fas fa-user';
                 
-                if (contact.type === 'group') {
+                if (chat.type === 'group') {
                     avatarClass = 'avatar-group';
                     avatarIcon = 'fas fa-users';
-                } else if (contact.type === 'bot') {
-                    avatarClass = 'avatar-bot';
-                    avatarIcon = 'fas fa-robot';
+                } else if (chat.type === 'channel') {
+                    avatarClass = 'avatar-channel';
+                    avatarIcon = 'fas fa-bullhorn';
                 }
-                
-                // پیدا کردن آخرین پیام
-                const chatMessages = messages[chat.id] || [];
-                const lastMessage = chatMessages[chatMessages.length - 1];
                 
                 chatElement.innerHTML = `
                     <div class="chat-avatar ${avatarClass}">
                         <i class="${avatarIcon}"></i>
-                        ${contact.online ? '<div class="online-status"></div>' : ''}
                     </div>
                     <div class="chat-info">
                         <div class="chat-name">
-                            ${contact.username}
-                            ${contact.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                            ${chat.name}
                         </div>
                         <div class="chat-last-message">
-                            ${lastMessage ? (lastMessage.sender === currentUser.userid ? 'شما: ' : '') + lastMessage.text : 'شروع چت'}
+                            ${chat.lastMessage || 'شروع چت'}
                         </div>
                     </div>
                     <div class="chat-meta">
-                        <div class="chat-time">${lastMessage ? formatTime(lastMessage.timestamp) : 'جدید'}</div>
+                        <div class="chat-time">${chat.lastMessageTime ? formatTime(chat.lastMessageTime) : 'جدید'}</div>
                         ${chat.unread > 0 ? `<div class="chat-unread">${chat.unread}</div>` : ''}
                     </div>
                 `;
@@ -1797,35 +1922,17 @@
         function openChat(chat) {
             currentChat = chat;
             
-            // پیدا کردن اطلاعات مخاطب
-            const otherParticipant = chat.participants.find(p => p !== currentUser.userid);
-            const contact = users.find(u => u.userid === otherParticipant);
+            document.getElementById('chat-with').innerHTML = `
+                ${chat.name}
+            `;
             
-            if (contact) {
-                document.getElementById('chat-with').innerHTML = `
-                    ${contact.username}
-                    ${contact.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
-                `;
-                
-                // تنظیم آواتار
-                const chatAvatar = document.getElementById('chat-header-avatar');
-                chatAvatar.className = `chat-avatar ${contact.type === 'group' ? 'avatar-group' : contact.type === 'bot' ? 'avatar-bot' : 'avatar-user'}`;
-                chatAvatar.innerHTML = `<i class="${contact.type === 'group' ? 'fas fa-users' : contact.type === 'bot' ? 'fas fa-robot' : 'fas fa-user'}"></i>`;
-                
-                // تنظیم وضعیت آنلاین
-                const onlineStatus = document.getElementById('chat-online-status');
-                if (contact.online) {
-                    onlineStatus.style.display = 'block';
-                    document.getElementById('status-text').textContent = 'آنلاین';
-                } else {
-                    onlineStatus.style.display = 'none';
-                    document.getElementById('status-text').textContent = formatLastSeen(contact.lastSeen);
-                }
-                
-                // تنظیم تایید شده
-                const verifiedBadge = document.getElementById('chat-verified-badge');
-                verifiedBadge.style.display = contact.verified ? 'inline-block' : 'none';
-            }
+            // تنظیم آواتار
+            const chatAvatar = document.getElementById('chat-header-avatar');
+            chatAvatar.className = `chat-avatar ${chat.type === 'group' ? 'avatar-group' : chat.type === 'channel' ? 'avatar-channel' : 'avatar-user'}`;
+            chatAvatar.innerHTML = `<i class="${chat.type === 'group' ? 'fas fa-users' : chat.type === 'channel' ? 'fas fa-bullhorn' : 'fas fa-user'}"></i>`;
+            
+            // تنظیم وضعیت
+            document.getElementById('status-text').textContent = getChatStatus(chat);
             
             elements.chatsList.classList.add('hidden');
             elements.chatContainer.classList.remove('hidden');
@@ -1834,8 +1941,41 @@
             // پاک کردن اعلان‌های خوانده شده
             if (chat.unread > 0) {
                 chat.unread = 0;
-                storage.set(STORAGE_KEYS.CHATS, chats);
+                
+                // به‌روزرسانی در ساختار داده مناسب
+                if (chat.type === 'group') {
+                    const groupIndex = groups.findIndex(g => g.id === chat.id);
+                    if (groupIndex !== -1) {
+                        groups[groupIndex].unread = 0;
+                        storage.set(STORAGE_KEYS.GROUPS, groups);
+                    }
+                } else if (chat.type === 'channel') {
+                    const channelIndex = channels.findIndex(c => c.id === chat.id);
+                    if (channelIndex !== -1) {
+                        channels[channelIndex].unread = 0;
+                        storage.set(STORAGE_KEYS.CHANNELS, channels);
+                    }
+                } else {
+                    const chatIndex = chats.findIndex(c => c.id === chat.id);
+                    if (chatIndex !== -1) {
+                        chats[chatIndex].unread = 0;
+                        storage.set(STORAGE_KEYS.CHATS, chats);
+                    }
+                }
+                
                 loadChats();
+            }
+        }
+
+        // دریافت وضعیت چت
+        function getChatStatus(chat) {
+            if (chat.type === 'channel') {
+                return 'کانال';
+            } else if (chat.type === 'group') {
+                const memberCount = chat.participants ? chat.participants.length : 0;
+                return `${memberCount} عضو`;
+            } else {
+                return 'آنلاین';
             }
         }
 
@@ -1867,8 +2007,11 @@
                     statusIcon = '<span class="message-status"><i class="fas fa-check-double"></i></span>';
                 }
                 
+                // پردازش متن پیام برای شناسایی @mention
+                const processedText = processMentions(message.text);
+                
                 messageElement.innerHTML = `
-                    <div class="message-text">${message.text}</div>
+                    <div class="message-text">${processedText}</div>
                     <div class="message-time">${formatTime(message.timestamp)}</div>
                     ${statusIcon}
                 `;
@@ -1879,12 +2022,40 @@
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
         }
 
+        // پردازش @mention در متن پیام
+        function processMentions(text) {
+            // الگو برای شناسایی @mention
+            const mentionRegex = /@(\w+)/g;
+            
+            return text.replace(mentionRegex, (match, username) => {
+                // بررسی وجود کاربر، گروه یا کانال با این ایدی
+                const user = users.find(u => u.userid === `@${username}`);
+                const group = groups.find(g => g.id === `@${username}`);
+                const channel = channels.find(c => c.id === `@${username}`);
+                
+                if (user || group || channel) {
+                    return `<span class="mention" data-id="@${username}">${match}</span>`;
+                } else {
+                    return match;
+                }
+            });
+        }
+
         // ارسال پیام
         function sendMessage() {
             const input = elements.messageInput;
             const text = input.value.trim();
             
             if (!text || !currentChat) return;
+            
+            // بررسی مجوز ارسال پیام
+            if (currentChat.type === 'channel') {
+                const channel = channels.find(c => c.id === currentChat.id);
+                if (channel && channel.owner !== currentUser.userid && !channel.admins.includes(currentUser.userid)) {
+                    showMessage('فقط مالک و ادمین‌ها می‌توانند در کانال پیام ارسال کنند');
+                    return;
+                }
+            }
             
             // ایجاد پیام جدید
             const newMessage = {
@@ -1907,8 +2078,12 @@
             // افزودن به رابط کاربری
             const messageElement = document.createElement('div');
             messageElement.className = 'message message-sent';
+            
+            // پردازش متن پیام برای شناسایی @mention
+            const processedText = processMentions(text);
+            
             messageElement.innerHTML = `
-                <div class="message-text">${text}</div>
+                <div class="message-text">${processedText}</div>
                 <div class="message-time">${formatTime(newMessage.timestamp)}</div>
                 <span class="message-status"><i class="fas fa-check-double"></i></span>
             `;
@@ -1927,139 +2102,159 @@
             // اسکرول به پایین
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
             
-            // به‌روزرسانی آخرین پیام در لیست چت‌ها
+            // به‌روزرسانی آخرین پیام
             updateLastMessage(currentChat.id, text);
             
-            // شبیه‌سازی پاسخ پس از 1-3 ثانیه (در صورت چت با ربات)
-            const otherParticipant = currentChat.participants.find(p => p !== currentUser.userid);
-            const contact = users.find(u => u.userid === otherParticipant);
+            // اضافه کردن رویداد کلیک برای mentionها
+            messageElement.querySelectorAll('.mention').forEach(mention => {
+                mention.addEventListener('click', () => {
+                    const mentionId = mention.getAttribute('data-id');
+                    handleMentionClick(mentionId);
+                });
+            });
+        }
+
+        // مدیریت کلیک روی mention
+        function handleMentionClick(mentionId) {
+            // بررسی وجود کاربر، گروه یا کانال با این ایدی
+            const user = users.find(u => u.userid === mentionId);
+            const group = groups.find(g => g.id === mentionId);
+            const channel = channels.find(c => c.id === mentionId);
             
-            if (contact && contact.type === 'bot') {
-                setTimeout(() => {
-                    // شبیه‌سازی تایپ
-                    simulateTyping(contact);
+            if (user) {
+                // ایجاد یا باز کردن چت با کاربر
+                let existingChat = chats.find(chat => 
+                    chat.participants && 
+                    chat.participants.includes(currentUser.userid) && 
+                    chat.participants.includes(mentionId)
+                );
+                
+                if (existingChat) {
+                    openChat(existingChat);
+                } else {
+                    // ایجاد چت جدید
+                    const newChat = {
+                        id: Date.now(),
+                        participants: [currentUser.userid, mentionId],
+                        name: user.username,
+                        type: 'user',
+                        createdAt: new Date().toISOString(),
+                        unread: 0,
+                        lastMessage: '',
+                        lastMessageTime: new Date().toISOString()
+                    };
                     
-                    setTimeout(() => {
-                        const responses = [
-                            'خیلی خوبه!',
-                            'متشکرم',
-                            'چه خبر؟',
-                            'جالبه!',
-                            'باشه، متوجه شدم',
-                            'چه کاری می‌تونم براتون انجام بدم؟',
-                            'لطفاً بیشتر توضیح دهید',
-                            'متأسفم، متوجه نشدم'
-                        ];
-                        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                        
-                        const responseMessage = {
-                            id: Date.now() + 1,
-                            text: randomResponse,
-                            sender: contact.userid,
-                            timestamp: new Date().toISOString(),
-                            chatId: currentChat.id
-                        };
-                        
-                        messages[currentChat.id].push(responseMessage);
-                        storage.set(STORAGE_KEYS.MESSAGES, messages);
-                        
-                        const responseElement = document.createElement('div');
-                        responseElement.className = 'message message-received';
-                        responseElement.innerHTML = `
-                            <div class="message-text">${randomResponse}</div>
-                            <div class="message-time">${formatTime(responseMessage.timestamp)}</div>
-                        `;
-                        elements.messagesContainer.appendChild(responseElement);
-                        
-                        elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
-                        
-                        // به‌روزرسانی آخرین پیام در لیست چت‌ها
-                        updateLastMessage(currentChat.id, randomResponse);
-                        
-                        // افزایش تعداد پیام‌های خوانده نشده
-                        currentChat.unread = (currentChat.unread || 0) + 1;
-                        storage.set(STORAGE_KEYS.CHATS, chats);
-                        
-                    }, 1500 + Math.random() * 2000); // تأخیر تصادفی بین 1.5 تا 3.5 ثانیه
-                }, 500 + Math.random() * 1000); // تأخیر اولیه
+                    chats.push(newChat);
+                    storage.set(STORAGE_KEYS.CHATS, chats);
+                    openChat(newChat);
+                }
+            } else if (group) {
+                openChat({
+                    id: group.id,
+                    name: group.name,
+                    type: 'group',
+                    participants: group.members,
+                    lastMessage: group.lastMessage || '',
+                    lastMessageTime: group.lastMessageTime || new Date().toISOString(),
+                    unread: group.unread || 0
+                });
+            } else if (channel) {
+                openChat({
+                    id: channel.id,
+                    name: channel.name,
+                    type: 'channel',
+                    participants: channel.members,
+                    lastMessage: channel.lastMessage || '',
+                    lastMessageTime: channel.lastMessageTime || new Date().toISOString(),
+                    unread: channel.unread || 0
+                });
+            } else {
+                showMessage('هیچ حسابی با این آدرس در پیامرسان سعدی وجود ندارد');
             }
         }
 
-        // شبیه‌سازی تایپ کردن
-        function simulateTyping(contact) {
-            elements.typingIndicator.classList.remove('hidden');
-            elements.statusText.style.display = 'none';
-            
-            // پنهان کردن نشانگر تایپ بعد از 2-4 ثانیه
-            setTimeout(() => {
-                elements.typingIndicator.classList.add('hidden');
-                elements.statusText.style.display = 'block';
-            }, 2000 + Math.random() * 2000);
-        }
-
-        // مدیریت تایپ کردن کاربر
-        function handleTyping() {
-            if (!currentChat) return;
-            
-            const otherParticipant = currentChat.participants.find(p => p !== currentUser.userid);
-            const contact = users.find(u => u.userid === otherParticipant);
-            
-            if (contact && contact.type === 'bot') {
-                // در یک برنامه واقعی، این اطلاعات به سرور ارسال می‌شود
-                // و به کاربر مقابل اطلاع داده می‌شود که در حال تایپ هستید
-                
-                // پاک کردن تایماوت قبلی
-                if (typingTimeout) {
-                    clearTimeout(typingTimeout);
-                }
-                
-                // تنظیم تایماوت جدید
-                typingTimeout = setTimeout(() => {
-                    // بعد از 1 ثانیه بدون تایپ، وضعیت تایپ کردن پایان می‌یابد
-                    isTyping = false;
-                }, 1000);
-                
-                if (!isTyping) {
-                    isTyping = true;
-                    // در یک برنامه واقعی، اینجا وضعیت "در حال تایپ" به سرور ارسال می‌شود
-                }
-            }
-        }
-
-        // به‌روزرسانی آخرین پیام در لیست چت‌ها
+        // به‌روزرسانی آخرین پیام
         function updateLastMessage(chatId, lastMessageText) {
-            const chatIndex = chats.findIndex(c => c.id === chatId);
-            if (chatIndex !== -1) {
-                chats[chatIndex].lastMessage = lastMessageText;
-                chats[chatIndex].lastMessageTime = new Date().toISOString();
-                storage.set(STORAGE_KEYS.CHATS, chats);
-                loadChats();
+            if (currentChat.type === 'group') {
+                const groupIndex = groups.findIndex(g => g.id === chatId);
+                if (groupIndex !== -1) {
+                    groups[groupIndex].lastMessage = lastMessageText;
+                    groups[groupIndex].lastMessageTime = new Date().toISOString();
+                    storage.set(STORAGE_KEYS.GROUPS, groups);
+                }
+            } else if (currentChat.type === 'channel') {
+                const channelIndex = channels.findIndex(c => c.id === chatId);
+                if (channelIndex !== -1) {
+                    channels[channelIndex].lastMessage = lastMessageText;
+                    channels[channelIndex].lastMessageTime = new Date().toISOString();
+                    storage.set(STORAGE_KEYS.CHANNELS, channels);
+                }
+            } else {
+                const chatIndex = chats.findIndex(c => c.id === chatId);
+                if (chatIndex !== -1) {
+                    chats[chatIndex].lastMessage = lastMessageText;
+                    chats[chatIndex].lastMessageTime = new Date().toISOString();
+                    storage.set(STORAGE_KEYS.CHATS, chats);
+                }
             }
+            
+            loadChats();
         }
 
         // نمایش لیست چت‌ها
         function showChatsList() {
             elements.chatContainer.classList.add('hidden');
+            elements.newChatContainer.classList.add('hidden');
+            elements.createGroupContainer.classList.add('hidden');
+            elements.createChannelContainer.classList.add('hidden');
             elements.chatsList.classList.remove('hidden');
             currentChat = null;
         }
 
-        // نمایش صفحه ایجاد چت جدید
-        function showNewChat() {
+        // نمایش فرم ایجاد چت جدید
+        function showNewChatForm() {
+            elements.menuDropdown.classList.add('hidden');
             elements.chatsList.classList.add('hidden');
             elements.newChatContainer.classList.remove('hidden');
-            document.getElementById('header-title').textContent = 'چت جدید';
+            document.getElementById('header-title').textContent = 'شروع چت جدید';
         }
 
-        // نمایش صفحه جستجو
-        function showSearch() {
-            showMessage('قابلیت جستجو به زودی اضافه خواهد شد');
+        // نمایش فرم ایجاد گروه
+        function showCreateGroupForm() {
+            elements.menuDropdown.classList.add('hidden');
+            elements.chatsList.classList.add('hidden');
+            elements.createGroupContainer.classList.remove('hidden');
+            document.getElementById('header-title').textContent = 'ایجاد گروه';
         }
-        
+
+        // نمایش فرم ایجاد کانال
+        function showCreateChannelForm() {
+            elements.menuDropdown.classList.add('hidden');
+            elements.chatsList.classList.add('hidden');
+            elements.createChannelContainer.classList.remove('hidden');
+            document.getElementById('header-title').textContent = 'ایجاد کانال';
+        }
+
         // شروع چت جدید
-        function startNewChat(userid) {
-            const contact = users.find(c => c.userid === userid);
-            if (!contact) return;
+        function startNewChat() {
+            const userid = document.getElementById('new-chat-userid').value.trim();
+            
+            if (!userid) {
+                showMessage('لطفاً ایدی کاربر مقابل را وارد کنید');
+                return;
+            }
+            
+            if (!userid.startsWith('@')) {
+                showMessage('ایدی کاربری باید با @ شروع شود');
+                return;
+            }
+            
+            // بررسی وجود کاربر
+            const user = users.find(u => u.userid === userid);
+            if (!user) {
+                showMessage('کاربری با این ایدی یافت نشد');
+                return;
+            }
             
             // بررسی اگر چت از قبل وجود دارد
             let existingChat = chats.find(chat => 
@@ -2071,8 +2266,6 @@
             if (existingChat) {
                 // باز کردن چت موجود
                 openChat(existingChat);
-                elements.newChatContainer.classList.add('hidden');
-                elements.chatContainer.classList.remove('hidden');
                 return;
             }
             
@@ -2080,6 +2273,8 @@
             const newChat = {
                 id: Date.now(),
                 participants: [currentUser.userid, userid],
+                name: user.username,
+                type: 'user',
                 createdAt: new Date().toISOString(),
                 unread: 0,
                 lastMessage: '',
@@ -2090,31 +2285,117 @@
             chats.push(newChat);
             storage.set(STORAGE_KEYS.CHATS, chats);
             
-            // بازگشت به لیست چت‌ها
-            elements.newChatContainer.classList.add('hidden');
-            elements.chatsList.classList.remove('hidden');
-            document.getElementById('header-title').textContent = 'چت‌ها';
-            
-            // بارگذاری مجدد لیست چت‌ها
-            loadChats();
-            
             // باز کردن چت جدید
             openChat(newChat);
         }
-        
-        // فیلتر مخاطبین
-        function filterContacts(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const contactItems = document.querySelectorAll('.contact-item');
+
+        // ایجاد گروه
+        function createGroup() {
+            const name = document.getElementById('group-name').value.trim();
+            const groupId = document.getElementById('group-id').value.trim();
+            const bio = document.getElementById('group-bio').value.trim();
+            const memberId = document.getElementById('group-member').value.trim();
             
-            contactItems.forEach(item => {
-                const name = item.querySelector('.chat-name').textContent.toLowerCase();
-                if (name.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+            if (!name || !groupId) {
+                showMessage('لطفاً نام و ایدی گروه را وارد کنید');
+                return;
+            }
+            
+            if (!groupId.startsWith('@')) {
+                showMessage('ایدی گروه باید با @ شروع شود');
+                return;
+            }
+            
+            // بررسی تکراری نبودن ایدی گروه
+            const existingGroup = groups.find(g => g.id === groupId);
+            if (existingGroup) {
+                showMessage('گروهی با این ایدی قبلاً ایجاد شده است');
+                return;
+            }
+            
+            // بررسی وجود کاربر عضو
+            if (memberId && !users.find(u => u.userid === memberId)) {
+                showMessage('کاربری با این ایدی یافت نشد');
+                return;
+            }
+            
+            // ایجاد گروه جدید
+            const newGroup = {
+                id: groupId,
+                name: name,
+                bio: bio,
+                owner: currentUser.userid,
+                admins: [currentUser.userid],
+                members: memberId ? [currentUser.userid, memberId] : [currentUser.userid],
+                createdAt: new Date().toISOString(),
+                unread: 0,
+                lastMessage: '',
+                lastMessageTime: new Date().toISOString(),
+                reactionsEnabled: true
+            };
+            
+            // ذخیره گروه
+            groups.push(newGroup);
+            storage.set(STORAGE_KEYS.GROUPS, groups);
+            
+            showMessage('گروه با موفقیت ایجاد شد!', 'success');
+            
+            // بازگشت به لیست چت‌ها
+            showChatsList();
+            loadChats();
+        }
+
+        // ایجاد کانال
+        function createChannel() {
+            const name = document.getElementById('channel-name').value.trim();
+            const channelId = document.getElementById('channel-id').value.trim();
+            const bio = document.getElementById('channel-bio').value.trim();
+            
+            if (!name || !channelId) {
+                showMessage('لطفاً نام و ایدی کانال را وارد کنید');
+                return;
+            }
+            
+            if (!channelId.startsWith('@')) {
+                showMessage('ایدی کانال باید با @ شروع شود');
+                return;
+            }
+            
+            // بررسی تکراری نبودن ایدی کانال
+            const existingChannel = channels.find(c => c.id === channelId);
+            if (existingChannel) {
+                showMessage('کانالی با این ایدی قبلاً ایجاد شده است');
+                return;
+            }
+            
+            // ایجاد کانال جدید
+            const newChannel = {
+                id: channelId,
+                name: name,
+                bio: bio,
+                owner: currentUser.userid,
+                admins: [currentUser.userid],
+                members: [currentUser.userid],
+                createdAt: new Date().toISOString(),
+                unread: 0,
+                lastMessage: '',
+                lastMessageTime: new Date().toISOString()
+            };
+            
+            // ذخیره کانال
+            channels.push(newChannel);
+            storage.set(STORAGE_KEYS.CHANNELS, channels);
+            
+            showMessage('کانال با موفقیت ایجاد شد!', 'success');
+            
+            // بازگشت به لیست چت‌ها
+            showChatsList();
+            loadChats();
+        }
+
+        // نمایش صفحه جستجو
+        function showSearch() {
+            showMessage('قابلیت جستجو به زودی اضافه خواهد شد');
         }
         
         // نمایش مودال
@@ -2179,9 +2460,6 @@
             
             showMessage('پروفایل با موفقیت به‌روزرسانی شد', 'success');
             hideModal('profile-modal');
-            
-            // به‌روزرسانی مخاطبین
-            updateContacts();
         }
         
         // ذخیره تنظیمات حریم خصوصی
@@ -2197,7 +2475,7 @@
         
         // نمایش راهنما
         function showHelp() {
-            showMessage('راهنمای استفاده از پیامرسان سعدی:\n\n• برای شروع چت جدید، روی دکمه + در صفحه اصلی کلیک کنید\n• برای ارسال پیام، در صفحه چت پیام خود را تایپ کرده و دکمه ارسال را بزنید\n• در تنظیمات می‌توانید پروفایل، حریم خصوصی و سایر تنظیمات را تغییر دهید\n• برای مشاهده وضعیت آنلاین کاربران، به لیست چت‌ها مراجعه کنید');
+            showMessage('راهنمای استفاده از پیامرسان سعدی:\n\n• برای شروع چت جدید، روی دکمه ⋮ کلیک کنید\n• برای ایجاد گروه یا کانال، از منوی ⋮ استفاده کنید\n• برای ارسال پیام، در صفحه چت پیام خود را تایپ کرده و دکمه ارسال را بزنید\n• برای اشاره به کاربران، گروه‌ها یا کانال‌ها از @ استفاده کنید\n• در تنظیمات می‌توانید پروفایل، حریم خصوصی و سایر تنظیمات را تغییر دهید');
         }
         
         // تغییر تم
@@ -2251,6 +2529,27 @@
             showAuthScreen();
         }
         
+        // مدیریت تایپ کردن کاربر
+        function handleTyping() {
+            if (!currentChat) return;
+            
+            // پاک کردن تایماوت قبلی
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            
+            // تنظیم تایماوت جدید
+            typingTimeout = setTimeout(() => {
+                // بعد از 1 ثانیه بدون تایپ، وضعیت تایپ کردن پایان می‌یابد
+                isTyping = false;
+            }, 1000);
+            
+            if (!isTyping) {
+                isTyping = true;
+                // در یک برنامه واقعی، اینجا وضعیت "در حال تایپ" به سرور ارسال می‌شود
+            }
+        }
+        
         // فرمت زمان
         function formatTime(timestamp) {
             const date = new Date(timestamp);
@@ -2275,26 +2574,9 @@
             }
         }
         
-        // فرمت آخرین بازدید
-        function formatLastSeen(timestamp) {
-            const date = new Date(timestamp);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffMinutes = Math.floor(diffTime / (1000 * 60));
-            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffMinutes < 1) {
-                return 'هم اکنون';
-            } else if (diffMinutes < 60) {
-                return `${diffMinutes} دقیقه قبل`;
-            } else if (diffHours < 24) {
-                return `${diffHours} ساعت قبل`;
-            } else if (diffDays === 1) {
-                return 'دیروز';
-            } else {
-                return date.toLocaleDateString('fa-IR');
-            }
+        // نمایش/پنهان کردن منو
+        function toggleMenu() {
+            elements.menuDropdown.classList.toggle('hidden');
         }
 
         // راه‌اندازی برنامه
