@@ -110,14 +110,14 @@
             background: var(--background-color);
             display: flex;
             flex-direction: column;
-            overflow-y: auto; /* اضافه کردن اسکرول عمودی */
+            overflow-y: auto;
         }
 
         .auth-header {
             padding: 4rem 2rem 2rem;
             text-align: center;
             background: var(--primary-color);
-            flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
+            flex-shrink: 0;
         }
 
         .auth-logo {
@@ -157,7 +157,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
-            min-height: fit-content; /* تضمین ارتفاع مناسب */
+            min-height: fit-content;
         }
 
         .auth-tabs {
@@ -347,7 +347,7 @@
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 60px; /* فضای برای تب‌بار */
+            padding-bottom: 60px;
         }
 
         /* لیست چت‌ها */
@@ -504,7 +504,6 @@
             flex-direction: column;
             gap: 2px;
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
-            /* ارتفاع پیام‌ها را تنظیم می‌کنیم تا جای تایپ کردن دیده شود */
             max-height: calc(100vh - 140px);
         }
 
@@ -568,7 +567,6 @@
             gap: 12px;
             border-top: 1px solid var(--border-color);
             min-height: 62px;
-            /* این قسمت را در پایین ثابت می‌کنیم */
             position: fixed;
             bottom: 60px;
             left: 0;
@@ -1253,6 +1251,7 @@
             <div class="auth-tabs">
                 <button class="auth-tab active" id="login-tab">ورود</button>
                 <button class="auth-tab" id="register-tab">ثبت‌نام</button>
+                <button class="auth-tab" id="phone-tab">ورود با شماره</button>
             </div>
             
             <div id="login-form">
@@ -1263,13 +1262,32 @@
             
             <div id="register-form" class="hidden">
                 <input type="text" class="auth-input" id="register-username" placeholder="نام کاربری جدید">
-                <input type="text" class="auth-input" id="register-userid" placeholder="ایدی کاربری (مثال: @user123)">
+                <input type="text" class="auth-input" id="register-userid" placeholder="ایدی کاربری (مثال: user123)">
+                <input type="tel" class="auth-input" id="register-phone" placeholder="شماره تلفن (اختیاری)">
                 <input type="password" class="auth-input" id="register-password" placeholder="رمز عبور">
                 <input type="password" class="auth-input" id="register-confirm" placeholder="تکرار رمز عبور">
                 <button class="auth-button" id="register-btn">ایجاد حساب جدید</button>
             </div>
             
+            <div id="phone-form" class="hidden">
+                <input type="tel" class="auth-input" id="phone-number" placeholder="شماره تلفن (مثال: 09123456789)">
+                <button class="auth-button" id="send-otp-btn">ارسال کد تأیید</button>
+                <div id="otp-section" class="hidden">
+                    <input type="text" class="auth-input" id="otp-code" placeholder="کد تأیید">
+                    <button class="auth-button" id="verify-otp-btn">تأیید کد</button>
+                </div>
+            </div>
+            
             <div class="auth-message" id="auth-message"></div>
+            
+            <!-- اطلاعات حساب‌های نمونه برای تست -->
+            <div style="margin-top: 20px; padding: 15px; background: var(--border-color); border-radius: 10px; font-size: 12px;">
+                <div style="margin-bottom: 10px; font-weight: bold;">حساب‌های نمونه برای تست:</div>
+                <div>نام کاربری: <strong>admin</strong> | رمز: <strong>123456</strong></div>
+                <div>نام کاربری: <strong>user1</strong> | رمز: <strong>123456</strong></div>
+                <div>نام کاربری: <strong>user2</strong> | رمز: <strong>123456</strong></div>
+                <div style="margin-top: 10px;">برای چت، از ایدی‌های: <strong>admin</strong>, <strong>user1</strong>, <strong>user2</strong> استفاده کنید</div>
+            </div>
         </div>
     </div>
 
@@ -1535,11 +1553,17 @@
             <div class="new-chat-container hidden" id="new-chat-container">
                 <div class="form-group">
                     <label class="form-label">ایدی کاربر مقابل</label>
-                    <input type="text" class="form-input" id="new-chat-userid" placeholder="@userid">
+                    <input type="text" class="form-input" id="new-chat-userid" placeholder="userid (بدون @)">
                 </div>
                 <div class="form-actions">
                     <button class="modal-btn secondary" id="cancel-new-chat">انصراف</button>
                     <button class="modal-btn primary" id="start-new-chat">شروع چت</button>
+                </div>
+                
+                <!-- لیست کاربران موجود -->
+                <div style="margin-top: 20px; padding: 15px; background: var(--border-color); border-radius: 10px;">
+                    <div style="margin-bottom: 10px; font-weight: bold;">کاربران موجود:</div>
+                    <div id="available-users-list"></div>
                 </div>
             </div>
 
@@ -1551,7 +1575,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">ایدی گروه</label>
-                    <input type="text" class="form-input" id="group-id" placeholder="@groupid">
+                    <input type="text" class="form-input" id="group-id" placeholder="groupid">
                 </div>
                 <div class="form-group">
                     <label class="form-label">بیوگرافی گروه</label>
@@ -1559,7 +1583,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">عضو اول (ایدی کاربری)</label>
-                    <input type="text" class="form-input" id="group-member" placeholder="@userid">
+                    <input type="text" class="form-input" id="group-member" placeholder="userid">
                 </div>
                 <div class="form-actions">
                     <button class="modal-btn secondary" id="cancel-create-group">انصراف</button>
@@ -1575,7 +1599,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">ایدی کانال</label>
-                    <input type="text" class="form-input" id="channel-id" placeholder="@channelid">
+                    <input type="text" class="form-input" id="channel-id" placeholder="channelid">
                 </div>
                 <div class="form-group">
                     <label class="form-label">بیوگرافی کانال</label>
@@ -1628,6 +1652,7 @@
         let channels = [];
         let isTyping = false;
         let typingTimeout = null;
+        let otpCode = null;
 
         // کلیدهای ذخیره‌سازی
         const STORAGE_KEYS = {
@@ -1646,6 +1671,7 @@
             messenger: document.getElementById('messenger-container'),
             loginForm: document.getElementById('login-form'),
             registerForm: document.getElementById('register-form'),
+            phoneForm: document.getElementById('phone-form'),
             authMessage: document.getElementById('auth-message'),
             chatsList: document.getElementById('chats-list'),
             chatContainer: document.getElementById('chat-container'),
@@ -1659,7 +1685,8 @@
             menuDropdown: document.getElementById('menu-dropdown'),
             messageInput: document.getElementById('message-input'),
             typingIndicator: document.getElementById('typing-indicator'),
-            statusText: document.getElementById('status-text')
+            statusText: document.getElementById('status-text'),
+            availableUsersList: document.getElementById('available-users-list')
         };
 
         // توابع ذخیره‌سازی
@@ -1718,13 +1745,16 @@
                 }
             }, 2500);
 
-            // رویدادهای تب‌های ورود/ثبت‌نام
+            // رویدادهای تب‌های ورود/ثبت‌نام/شماره
             document.getElementById('login-tab').addEventListener('click', () => switchAuthTab('login'));
             document.getElementById('register-tab').addEventListener('click', () => switchAuthTab('register'));
+            document.getElementById('phone-tab').addEventListener('click', () => switchAuthTab('phone'));
             
             // رویدادهای دکمه‌های ورود/ثبت‌نام
             document.getElementById('login-btn').addEventListener('click', login);
             document.getElementById('register-btn').addEventListener('click', register);
+            document.getElementById('send-otp-btn').addEventListener('click', sendOtp);
+            document.getElementById('verify-otp-btn').addEventListener('click', verifyOtp);
             
             // رویدادهای تب‌بار پایین
             document.querySelectorAll('.tab-item').forEach(tab => {
@@ -1843,21 +1873,23 @@
                 users = [
                     {
                         id: 1,
-                        username: 'محمد حسین',
-                        userid: '@MMDhosein',
+                        username: 'مدیر سعدی',
+                        userid: 'admin',
                         password: '123456',
+                        phone: '09123456789',
                         online: true,
                         verified: true,
                         type: 'user',
-                        bio: 'حرف های پشت سرم حرف نیست عقده است......',
+                        bio: 'مدیر پیامرسان سعدی',
                         lastSeen: new Date().toISOString(),
                         number: '68995-63/5/53'
                     },
                     {
                         id: 2,
-                        username: 'کاربر مهمان',
-                        userid: '@guest',
+                        username: 'کاربر نمونه ۱',
+                        userid: 'user1',
                         password: '123456',
+                        phone: '09123456780',
                         online: true,
                         verified: false,
                         type: 'user',
@@ -1867,9 +1899,23 @@
                     },
                     {
                         id: 3,
-                        username: 'پشتیبانی سعدی',
-                        userid: '@support',
+                        username: 'کاربر نمونه ۲',
+                        userid: 'user2',
                         password: '123456',
+                        phone: '09123456781',
+                        online: true,
+                        verified: false,
+                        type: 'user',
+                        bio: 'کاربر نمونه پیامرسان سعدی',
+                        lastSeen: new Date().toISOString(),
+                        number: '54321-09/8/76'
+                    },
+                    {
+                        id: 4,
+                        username: 'پشتیبانی سعدی',
+                        userid: 'support',
+                        password: '123456',
+                        phone: '02112345678',
                         online: true,
                         verified: true,
                         type: 'user',
@@ -1886,22 +1932,12 @@
                 chats = [
                     {
                         id: 'chat_support',
-                        participants: ['@admin', '@support'],
+                        participants: ['admin', 'support'],
                         name: 'پشتیبانی سعدی',
                         type: 'user',
                         createdAt: new Date().toISOString(),
                         unread: 0,
                         lastMessage: 'به پیامرسان سعدی خوش آمدید!',
-                        lastMessageTime: new Date().toISOString()
-                    },
-                    {
-                        id: 'chat_guest',
-                        participants: ['@admin', '@guest'],
-                        name: 'کاربر مهمان',
-                        type: 'user',
-                        createdAt: new Date().toISOString(),
-                        unread: 1,
-                        lastMessage: 'سلام! چطوری؟',
                         lastMessageTime: new Date().toISOString()
                     }
                 ];
@@ -1915,7 +1951,7 @@
                         {
                             id: 1,
                             text: 'به پیامرسان سعدی خوش آمدید!',
-                            sender: '@support',
+                            sender: 'support',
                             timestamp: new Date(Date.now() - 300000).toISOString(),
                             chatId: 'chat_support',
                             status: 'delivered'
@@ -1923,19 +1959,9 @@
                         {
                             id: 2,
                             text: 'چگونه می‌توانم کمک کنم؟',
-                            sender: '@support',
+                            sender: 'support',
                             timestamp: new Date(Date.now() - 240000).toISOString(),
                             chatId: 'chat_support',
-                            status: 'delivered'
-                        }
-                    ],
-                    'chat_guest': [
-                        {
-                            id: 1,
-                            text: 'سلام! چطوری؟',
-                            sender: '@guest',
-                            timestamp: new Date(Date.now() - 180000).toISOString(),
-                            chatId: 'chat_guest',
                             status: 'delivered'
                         }
                     ]
@@ -1957,18 +1983,33 @@
             loadChats();
         }
 
-        // تغییر تب ورود/ثبت‌نام
+        // تغییر تب ورود/ثبت‌نام/شماره
         function switchAuthTab(tab) {
-            if (tab === 'login') {
-                document.getElementById('login-tab').classList.add('active');
-                document.getElementById('register-tab').classList.remove('active');
-                elements.loginForm.classList.remove('hidden');
-                elements.registerForm.classList.add('hidden');
-            } else {
-                document.getElementById('register-tab').classList.add('active');
-                document.getElementById('login-tab').classList.remove('active');
-                elements.registerForm.classList.remove('hidden');
-                elements.loginForm.classList.add('hidden');
+            // به‌روزرسانی تب‌های فعال
+            document.getElementById('login-tab').classList.remove('active');
+            document.getElementById('register-tab').classList.remove('active');
+            document.getElementById('phone-tab').classList.remove('active');
+            
+            // پنهان کردن همه فرم‌ها
+            elements.loginForm.classList.add('hidden');
+            elements.registerForm.classList.add('hidden');
+            elements.phoneForm.classList.add('hidden');
+            document.getElementById('otp-section').classList.add('hidden');
+            
+            // نمایش فرم انتخاب شده
+            switch(tab) {
+                case 'login':
+                    document.getElementById('login-tab').classList.add('active');
+                    elements.loginForm.classList.remove('hidden');
+                    break;
+                case 'register':
+                    document.getElementById('register-tab').classList.add('active');
+                    elements.registerForm.classList.remove('hidden');
+                    break;
+                case 'phone':
+                    document.getElementById('phone-tab').classList.add('active');
+                    elements.phoneForm.classList.remove('hidden');
+                    break;
             }
         }
 
@@ -1999,7 +2040,7 @@
             
             // پیدا کردن کاربر
             const user = users.find(item => 
-                (item.username === username || item.userid === username) && 
+                (item.username === username || item.userid === username || item.phone === username) && 
                 item.password === password
             );
             
@@ -2027,11 +2068,12 @@
         function register() {
             const username = document.getElementById('register-username').value;
             const userid = document.getElementById('register-userid').value;
+            const phone = document.getElementById('register-phone').value;
             const password = document.getElementById('register-password').value;
             const confirm = document.getElementById('register-confirm').value;
             
             if (!username || !userid || !password || !confirm) {
-                showAuthMessage('لطفاً تمام فیلدها را پر کنید', 'error');
+                showAuthMessage('لطفاً تمام فیلدهای ضروری را پر کنید', 'error');
                 return;
             }
             
@@ -2040,18 +2082,13 @@
                 return;
             }
             
-            if (!userid.startsWith('@')) {
-                showAuthMessage('ایدی کاربری باید با @ شروع شود', 'error');
-                return;
-            }
-            
             // بررسی تکراری نبودن نام کاربری و ایدی
             const existingUser = users.find(item => 
-                item.username === username || item.userid === userid
+                item.username === username || item.userid === userid || (phone && item.phone === phone)
             );
             
             if (existingUser) {
-                showAuthMessage('این نام کاربری یا ایدی قبلاً ثبت شده است', 'error');
+                showAuthMessage('این نام کاربری، ایدی یا شماره تلفن قبلاً ثبت شده است', 'error');
                 return;
             }
             
@@ -2060,6 +2097,7 @@
                 id: Date.now(),
                 username: username,
                 userid: userid,
+                phone: phone || null,
                 password: password,
                 online: true,
                 verified: false,
@@ -2078,6 +2116,70 @@
             storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
             
             showAuthMessage('حساب کاربری با موفقیت ایجاد شد!', 'success');
+            setTimeout(() => {
+                showMessenger();
+            }, 1000);
+        }
+
+        // ارسال کد تأیید
+        function sendOtp() {
+            const phone = document.getElementById('phone-number').value;
+            
+            if (!phone) {
+                showAuthMessage('لطفاً شماره تلفن خود را وارد کنید', 'error');
+                return;
+            }
+            
+            // بررسی وجود کاربر با این شماره
+            const user = users.find(item => item.phone === phone);
+            if (!user) {
+                showAuthMessage('کاربری با این شماره تلفن یافت نشد', 'error');
+                return;
+            }
+            
+            // تولید کد تأیید تصادفی
+            otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // در یک برنامه واقعی، اینجا کد به شماره تلفن ارسال می‌شود
+            showAuthMessage(`کد تأیید: ${otpCode} (در برنامه واقعی به شماره شما ارسال می‌شود)`, 'success');
+            
+            // نمایش بخش وارد کردن کد
+            document.getElementById('otp-section').classList.remove('hidden');
+        }
+
+        // تأیید کد
+        function verifyOtp() {
+            const enteredOtp = document.getElementById('otp-code').value;
+            
+            if (!enteredOtp) {
+                showAuthMessage('لطفاً کد تأیید را وارد کنید', 'error');
+                return;
+            }
+            
+            if (enteredOtp !== otpCode) {
+                showAuthMessage('کد تأیید اشتباه است', 'error');
+                return;
+            }
+            
+            // پیدا کردن کاربر با شماره تلفن
+            const phone = document.getElementById('phone-number').value;
+            const user = users.find(item => item.phone === phone);
+            
+            if (!user) {
+                showAuthMessage('خطا در پیدا کردن کاربر', 'error');
+                return;
+            }
+            
+            // به‌روزرسانی وضعیت آنلاین
+            user.online = true;
+            user.lastSeen = new Date().toISOString();
+            storage.set(STORAGE_KEYS.USERS, users);
+            
+            // ذخیره کاربر جاری
+            currentUser = user;
+            storage.set(STORAGE_KEYS.CURRENT_USER, currentUser);
+            
+            showAuthMessage('ورود با موفقیت انجام شد!', 'success');
             setTimeout(() => {
                 showMessenger();
             }, 1000);
@@ -2203,6 +2305,39 @@
                 
                 chatElement.addEventListener('click', () => openChat(chat));
                 elements.chatsList.appendChild(chatElement);
+            });
+        }
+
+        // بارگذاری لیست کاربران موجود
+        function loadAvailableUsers() {
+            elements.availableUsersList.innerHTML = '';
+            
+            // فیلتر کردن کاربران (به جز کاربر جاری)
+            const availableUsers = users.filter(user => 
+                user.userid !== currentUser.userid
+            );
+            
+            if (availableUsers.length === 0) {
+                elements.availableUsersList.innerHTML = '<div>کاربری برای چت موجود نیست</div>';
+                return;
+            }
+            
+            availableUsers.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.style.padding = '8px 0';
+                userElement.style.borderBottom = '1px solid var(--border-color)';
+                userElement.style.cursor = 'pointer';
+                
+                userElement.innerHTML = `
+                    <div><strong>${user.username}</strong> (${user.userid})</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">${user.bio || 'بدون بیوگرافی'}</div>
+                `;
+                
+                userElement.addEventListener('click', () => {
+                    document.getElementById('new-chat-userid').value = user.userid;
+                });
+                
+                elements.availableUsersList.appendChild(userElement);
             });
         }
 
@@ -2495,7 +2630,7 @@
             updateLastMessage(currentChat.id, text);
             
             // اگر چت با ربات پشتیبانی است، پاسخ خودکار ارسال شود
-            if (currentChat.participants.includes('@support')) {
+            if (currentChat.participants.includes('support')) {
                 simulateSupportReply(currentChat.id, text);
             }
             
@@ -2518,7 +2653,7 @@
                 const replyMessage = {
                     id: Date.now(),
                     text: replyText,
-                    sender: '@support',
+                    sender: 'support',
                     timestamp: new Date().toISOString(),
                     chatId: chatId,
                     status: 'delivered'
@@ -2627,6 +2762,9 @@
             elements.chatsList.classList.add('hidden');
             elements.newChatContainer.classList.remove('hidden');
             document.getElementById('header-title').textContent = 'شروع چت جدید';
+            
+            // بارگذاری لیست کاربران موجود
+            loadAvailableUsers();
         }
 
         // نمایش فرم ایجاد گروه
@@ -2711,11 +2849,6 @@
                 return;
             }
             
-            if (!userid.startsWith('@')) {
-                showMessage('ایدی کاربری باید با @ شروع شود');
-                return;
-            }
-            
             // بررسی وجود کاربر
             const user = users.find(u => u.userid === userid);
             if (!user) {
@@ -2738,7 +2871,7 @@
             
             // ایجاد چت جدید
             const newChat = {
-                id: Date.now(),
+                id: `chat_${currentUser.userid}_${userid}`,
                 participants: [currentUser.userid, userid],
                 name: user.username,
                 type: 'user',
@@ -2765,11 +2898,6 @@
             
             if (!name || !groupId) {
                 showMessage('لطفاً نام و ایدی گروه را وارد کنید');
-                return;
-            }
-            
-            if (!groupId.startsWith('@')) {
-                showMessage('ایدی گروه باید با @ شروع شود');
                 return;
             }
             
@@ -2820,11 +2948,6 @@
             
             if (!name || !channelId) {
                 showMessage('لطفاً نام و ایدی کانال را وارد کنید');
-                return;
-            }
-            
-            if (!channelId.startsWith('@')) {
-                showMessage('ایدی کانال باید با @ شروع شود');
                 return;
             }
             
