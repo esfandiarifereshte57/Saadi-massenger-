@@ -6,37 +6,869 @@
     <title>پیامرسان سعدی | Saadi Messenger</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* تمام استایل‌های قبلی حفظ شده‌اند */
-        /* فقط استایل‌های جدید اضافه شده‌اند */
-        
-        .userid-link {
-            color: var(--primary-color);
-            text-decoration: none;
+        /* Reset و تنظیمات پایه */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #00a884;
+            --secondary-color: #202c33;
+            --background-color: #111b21;
+            --text-primary: #e9edef;
+            --text-secondary: #8696a0;
+            --message-sent: #005c4b;
+            --message-received: #202c33;
+            --border-color: #2a3942;
+            --online-status: #4ade80;
+            --typing-indicator: #8696a0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Vazir', 'Tahoma', sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            user-select: none;
+        }
+
+        /* صفحه اسپلش */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 2.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .splash-content {
+            text-align: center;
+            color: white;
+        }
+
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            border-radius: 28px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: logoPulse 2s infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .splash-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+        }
+
+        .splash-title {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .splash-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* صفحه ورود */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .auth-header {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            background: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .auth-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .auth-logo img {
+            width: 85px;
+            height: 85px;
+            border-radius: 15px;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .auth-form {
+            padding: 2.5rem 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-height: fit-content;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--border-color);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 15px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .auth-input:focus {
+            background: #2a3942;
+            box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.3);
+        }
+
+        .auth-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-button:hover {
+            background: #06a06b;
+        }
+
+        .auth-button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .auth-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .auth-message.success {
+            background: rgba(0, 168, 132, 0.2);
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 168, 132, 0.3);
+        }
+
+        .auth-message.error {
+            background: rgba(233, 93, 93, 0.2);
+            color: #e95d5d;
+            border: 1px solid rgba(233, 93, 93, 0.3);
+        }
+
+        /* صفحه اصلی */
+        .messenger-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: var(--background-color);
+        }
+
+        /* هدر */
+        .header {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 19px;
+            cursor: pointer;
+            padding: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:active {
+            background: var(--border-color);
+        }
+
+        /* تب‌بار پایین */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--secondary-color);
+            display: flex;
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            height: 60px;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 8px 0;
+            transition: all 0.2s ease;
+        }
+
+        .tab-item.active {
+            color: var(--primary-color);
+        }
+
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* محتوای اصلی */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 60px;
+        }
+
+        /* لیست چت‌ها */
+        .chats-list {
+            padding: 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .chat-item:active {
+            background: var(--border-color);
+        }
+
+        .chat-item.unread {
+            background: rgba(0, 168, 132, 0.05);
+        }
+
+        .chat-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-left: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar i {
+            font-size: 22px;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .verified-badge {
+            color: #1da1f2;
+            font-size: 14px;
+        }
+
+        .chat-last-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-meta {
+            text-align: left;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .chat-unread {
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 18px;
+            font-weight: 500;
+        }
+
+        /* صفحه چت */
+        .chat-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .chat-header-info {
+            flex: 1;
+        }
+
+        .chat-with {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .chat-status {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .typing-indicator {
+            color: var(--primary-color);
+            font-style: italic;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="%23111b21"/><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
+            max-height: calc(100vh - 140px);
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            word-wrap: break-word;
+            animation: slideIn 0.2s ease;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-sent {
+            align-self: flex-end;
+            background: var(--message-sent);
+            border-radius: 7.5px 7.5px 0 7.5px;
+        }
+
+        .message-received {
+            align-self: flex-start;
+            background: var(--message-received);
+            border-radius: 7.5px 7.5px 7.5px 0;
+        }
+
+        .message-text {
+            font-size: 14.5px;
+            line-height: 1.4;
+            margin-bottom: 2px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: left;
+            opacity: 0.8;
+        }
+
+        .message-status {
+            position: absolute;
+            bottom: 6px;
+            left: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .message-sent .message-status {
+            color: #8696a0;
+        }
+
+        .input-container {
+            background: var(--secondary-color);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            min-height: 62px;
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .message-input-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--border-color);
+            border-radius: 20px;
+            padding: 2px 5px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            max-height: 100px;
+            resize: none;
+            line-height: 1.4;
+        }
+
+        .message-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 5px;
+            padding: 0 5px;
+        }
+
+        .input-action {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .input-action:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .send-button:hover {
+            background: #06a06b;
+        }
+
+        .send-button:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* صفحه تنظیمات */
+        .settings-container {
+            padding: 16px;
+        }
+
+        .settings-section {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .settings-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item:active {
+            background: var(--border-color);
+        }
+
+        .settings-icon {
+            font-size: 20px;
+            margin-left: 12px;
+            width: 24px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .settings-text {
+            flex: 1;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .settings-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .settings-arrow {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* صفحه ایجاد چت جدید */
+        .new-chat-container {
+            padding: 16px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .contact-list {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .contact-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-item:active {
+            background: var(--border-color);
+        }
+
+        /* وضعیت‌های مختلف */
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: var(--text-secondary);
+        }
+
+        /* اسکرول بار سفارشی */
+        .auth-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .auth-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .auth-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2.5px;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2.5px;
+        }
+
+        /* سازگاری با iOS */
+        @supports (-webkit-touch-callout: none) {
+            .messenger-container {
+                height: -webkit-fill-available;
+            }
+        }
+
+        /* حالت لنداسکیپ */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 8px 16px;
+            }
+            
+            .messages-container {
+                padding: 8px 16px;
+                max-height: calc(100vh - 120px);
+            }
+            
+            .input-container {
+                padding: 8px 16px;
+                bottom: 60px;
+            }
+            
+            .auth-header {
+                padding: 2rem 2rem 1rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem 2rem;
+            }
+        }
+
+        /* آیکون وضعیت آنلاین */
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: var(--online-status);
+            border: 2px solid var(--background-color);
+            border-radius: 50%;
+        }
+
+        /* آواتارهای مختلف */
+        .avatar-user {
+            background: var(--primary-color);
+        }
+
+        .avatar-group {
+            background: #667eea;
+        }
+
+        .avatar-channel {
+            background: #0088cc;
+        }
+
+        .avatar-bot {
+            background: #ff6b6b;
         }
         
-        .userid-link:hover {
-            text-decoration: underline;
-        }
-        
+        /* مودال‌ها */
         .modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.6);
-            z-index: 1000;
+            display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1000;
             padding: 16px;
             backdrop-filter: blur(5px);
-        }
-        
-        .modal.show {
-            display: flex;
         }
         
         .modal-content {
@@ -110,6 +942,351 @@
         
         .modal-btn.secondary:active {
             background: #2a3942;
+        }
+
+        /* منوی سه نقطه */
+        .menu-dropdown {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 100;
+            width: 200px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:active {
+            background: var(--border-color);
+        }
+
+        .menu-icon {
+            font-size: 18px;
+            color: var(--text-secondary);
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* فرم‌های ایجاد */
+        .create-form {
+            padding: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* ریکشن‌ها */
+        .reactions-container {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        .reaction {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 2px 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .reaction-count {
+            color: var(--text-secondary);
+        }
+
+        .mention {
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .mention:hover {
+            text-decoration: underline;
+        }
+
+        /* منوی پیام */
+        .message-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 50;
+            width: 150px;
+        }
+
+        .message-menu-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .message-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-menu-item:active {
+            background: var(--border-color);
+        }
+
+        .message-menu-icon {
+            font-size: 16px;
+            color: var(--text-secondary);
+            width: 18px;
+            text-align: center;
+        }
+
+        .message-menu-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* آیکون منوی پیام */
+        .message-actions {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        /* صفحه پروفایل */
+        .profile-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header {
+            background: var(--secondary-color);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            margin-left: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .profile-content {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .profile-section {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .profile-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-width: 120px;
+        }
+
+        .profile-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .profile-bio {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* استایل‌های جدید برای تنظیمات */
+        .userid-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .userid-link:hover {
+            text-decoration: underline;
+        }
+        
+        .modal {
+            display: none;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -600,6 +1777,61 @@
         </div>
     </div>
 
+    <div class="modal" id="notification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">تنظیمات اعلان‌ها</div>
+                <button class="modal-close" onclick="hideModal('notification-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">اعلان‌های پیام</label>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>فعال</span>
+                        <label class="switch">
+                            <input type="checkbox" id="message-notifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">اعلان‌های گروه</label>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>فعال</span>
+                        <label class="switch">
+                            <input type="checkbox" id="group-notifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">اعلان‌های کانال</label>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>فعال</span>
+                        <label class="switch">
+                            <input type="checkbox" id="channel-notifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">صدا</label>
+                    <select class="form-select" id="notification-sound">
+                        <option value="default">پیش‌فرض</option>
+                        <option value="silent">بی‌صدا</option>
+                        <option value="custom">سفارشی</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="hideModal('notification-modal')">انصراف</button>
+                <button class="modal-btn primary" onclick="saveNotificationSettings()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="logout-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -638,7 +1870,8 @@
             MESSAGES: 'saadi_messenger_messages',
             CURRENT_USER: 'saadi_messenger_current_user',
             GROUPS: 'saadi_messenger_groups',
-            CHANNELS: 'saadi_messenger_channels'
+            CHANNELS: 'saadi_messenger_channels',
+            SETTINGS: 'saadi_messenger_settings'
         };
 
         // المان‌های DOM
@@ -664,6 +1897,22 @@
             typingIndicator: document.getElementById('typing-indicator'),
             statusText: document.getElementById('status-text'),
             availableUsersList: document.getElementById('available-users-list')
+        };
+
+        // تنظیمات پیش‌فرض
+        let appSettings = {
+            theme: 'dark',
+            notifications: {
+                message: true,
+                group: true,
+                channel: true,
+                sound: 'default'
+            },
+            privacy: {
+                lastSeen: 'everyone',
+                onlineStatus: 'everyone',
+                profilePic: 'everyone'
+            }
         };
 
         // توابع ذخیره‌سازی
@@ -770,7 +2019,7 @@
             document.getElementById('profile-settings').addEventListener('click', () => showProfileModal());
             document.getElementById('privacy-settings').addEventListener('click', () => showModal('privacy-modal'));
             document.getElementById('theme-settings').addEventListener('click', toggleTheme);
-            document.getElementById('notification-settings').addEventListener('click', () => showNotificationSettings());
+            document.getElementById('notification-settings').addEventListener('click', () => showModal('notification-modal'));
             document.getElementById('help-settings').addEventListener('click', () => showHelp());
             document.getElementById('logout-settings').addEventListener('click', () => showModal('logout-modal'));
             
@@ -842,6 +2091,12 @@
             groups = storage.get(STORAGE_KEYS.GROUPS) || [];
             channels = storage.get(STORAGE_KEYS.CHANNELS) || [];
             currentUser = storage.get(STORAGE_KEYS.CURRENT_USER);
+            
+            // بارگذاری تنظیمات
+            const savedSettings = storage.get(STORAGE_KEYS.SETTINGS);
+            if (savedSettings) {
+                appSettings = savedSettings;
+            }
         }
 
         // ایجاد کاربران نمونه
@@ -2157,13 +3412,37 @@
         
         // ذخیره تنظیمات حریم خصوصی
         function savePrivacySettings() {
+            appSettings.privacy.lastSeen = document.getElementById('last-seen-privacy').value;
+            appSettings.privacy.onlineStatus = document.getElementById('online-privacy').value;
+            appSettings.privacy.profilePic = document.getElementById('profile-pic-privacy').value;
+            
+            storage.set(STORAGE_KEYS.SETTINGS, appSettings);
+            
             showMessage('تنظیمات حریم خصوصی ذخیره شد', 'success');
             hideModal('privacy-modal');
         }
         
+        // ذخیره تنظیمات اعلان‌ها
+        function saveNotificationSettings() {
+            appSettings.notifications.message = document.getElementById('message-notifications').checked;
+            appSettings.notifications.group = document.getElementById('group-notifications').checked;
+            appSettings.notifications.channel = document.getElementById('channel-notifications').checked;
+            appSettings.notifications.sound = document.getElementById('notification-sound').value;
+            
+            storage.set(STORAGE_KEYS.SETTINGS, appSettings);
+            
+            showMessage('تنظیمات اعلان‌ها ذخیره شد', 'success');
+            hideModal('notification-modal');
+        }
+        
         // نمایش تنظیمات اعلان‌ها
         function showNotificationSettings() {
-            showMessage('تنظیمات اعلان‌ها به زودی اضافه خواهد شد');
+            document.getElementById('message-notifications').checked = appSettings.notifications.message;
+            document.getElementById('group-notifications').checked = appSettings.notifications.group;
+            document.getElementById('channel-notifications').checked = appSettings.notifications.channel;
+            document.getElementById('notification-sound').value = appSettings.notifications.sound;
+            
+            showModal('notification-modal');
         }
         
         // نمایش راهنما
@@ -2173,10 +3452,7 @@
         
         // تغییر تم
         function toggleTheme() {
-            const isDark = document.body.style.getPropertyValue('--background-color') === '#111b21' || 
-                          !document.body.style.getPropertyValue('--background-color');
-            
-            if (isDark) {
+            if (appSettings.theme === 'dark') {
                 // تغییر به تم روشن
                 document.body.style.setProperty('--background-color', '#f0f2f5');
                 document.body.style.setProperty('--secondary-color', '#ffffff');
@@ -2186,6 +3462,9 @@
                 document.body.style.setProperty('--message-received', '#ffffff');
                 document.body.style.setProperty('--border-color', '#e9edef');
                 document.body.style.setProperty('--online-status', '#00a884');
+                
+                appSettings.theme = 'light';
+                storage.set(STORAGE_KEYS.SETTINGS, appSettings);
                 
                 showMessage('تم روز فعال شد', 'success');
             } else {
@@ -2198,6 +3477,9 @@
                 document.body.style.setProperty('--message-received', '#202c33');
                 document.body.style.setProperty('--border-color', '#2a3942');
                 document.body.style.setProperty('--online-status', '#4ade80');
+                
+                appSettings.theme = 'dark';
+                storage.set(STORAGE_KEYS.SETTINGS, appSettings);
                 
                 showMessage('تم شب فعال شد', 'success');
             }
