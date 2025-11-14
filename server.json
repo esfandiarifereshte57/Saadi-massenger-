@@ -1,0 +1,28 @@
+const fs = require('fs');
+const path = require('path');
+
+// مسیر فایل‌های داده
+const dataPath = path.join(__dirname, 'data');
+const usersFile = path.join(dataPath, 'users.json');
+
+// تابع برای خواندن کاربران
+function readUsers() {
+    try {
+        const data = fs.readFileSync(usersFile, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        return { users: [] };
+    }
+}
+
+// تابع برای ذخیره کاربران
+function saveUsers(users) {
+    try {
+        fs.mkdirSync(dataPath, { recursive: true });
+        fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error saving users:', error);
+        return false;
+    }
+}
