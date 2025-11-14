@@ -110,12 +110,14 @@
             background: var(--background-color);
             display: flex;
             flex-direction: column;
+            overflow-y: auto; /* اضافه کردن اسکرول عمودی */
         }
 
         .auth-header {
             padding: 4rem 2rem 2rem;
             text-align: center;
             background: var(--primary-color);
+            flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
         }
 
         .auth-logo {
@@ -155,6 +157,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
+            min-height: fit-content; /* تضمین ارتفاع مناسب */
         }
 
         .auth-tabs {
@@ -767,6 +770,19 @@
         }
 
         /* اسکرول بار سفارشی */
+        .auth-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .auth-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .auth-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 2.5px;
+        }
+
         .messages-container::-webkit-scrollbar {
             width: 5px;
         }
@@ -801,6 +817,14 @@
             .input-container {
                 padding: 8px 16px;
                 bottom: 60px;
+            }
+            
+            .auth-header {
+                padding: 2rem 2rem 1rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem 2rem;
             }
         }
 
@@ -1161,6 +1185,7 @@
         .profile-content {
             padding: 16px;
             flex: 1;
+            overflow-y: auto;
         }
 
         .profile-section {
@@ -1592,79 +1617,6 @@
         </div>
     </div>
 
-    <!-- مودال‌ها -->
-    <div class="modal hidden" id="profile-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">ویرایش پروفایل</div>
-                <button class="modal-close" id="close-profile-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="text" class="auth-input" id="edit-username" placeholder="نام کاربری" style="margin-bottom: 12px;">
-                <input type="text" class="auth-input" id="edit-userid" placeholder="ایدی کاربری">
-                <textarea class="auth-input" id="edit-bio" placeholder="بیوگرافی" style="margin-top: 12px; height: 100px;"></textarea>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn secondary" id="cancel-profile">انصراف</button>
-                <button class="modal-btn primary" id="save-profile">ذخیره</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal hidden" id="privacy-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">تنظیمات حریم خصوصی</div>
-                <button class="modal-close" id="close-privacy-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="settings-item">
-                    <div class="settings-text">
-                        <div class="settings-title">نمایش وضعیت آنلاین</div>
-                        <div class="settings-desc">سایر کاربران می‌توانند وضعیت آنلاین شما را ببینند</div>
-                    </div>
-                    <div class="settings-arrow">
-                        <input type="checkbox" id="online-status-toggle" checked>
-                    </div>
-                </div>
-                <div class="settings-item">
-                    <div class="settings-text">
-                        <div class="settings-title">نمایش آخرین بازدید</div>
-                        <div class="settings-desc">سایر کاربران می‌توانند آخرین زمان آنلاین شما را ببینند</div>
-                    </div>
-                    <div class="settings-arrow">
-                        <input type="checkbox" id="last-seen-toggle" checked>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn primary" id="save-privacy">ذخیره</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal hidden" id="logout-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">خروج از حساب</div>
-                <button class="modal-close" id="close-logout-modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn secondary" id="cancel-logout">انصراف</button>
-                <button class="modal-btn primary" id="confirm-logout">خروج</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // داده‌های برنامه
         let currentUser = null;
@@ -1814,18 +1766,6 @@
             document.getElementById('notification-settings').addEventListener('click', () => showNotificationSettings());
             document.getElementById('help-settings').addEventListener('click', () => showHelp());
             document.getElementById('logout-settings').addEventListener('click', () => showModal('logout-modal'));
-            
-            // رویدادهای مودال‌ها
-            document.getElementById('close-profile-modal').addEventListener('click', () => hideModal('profile-modal'));
-            document.getElementById('cancel-profile').addEventListener('click', () => hideModal('profile-modal'));
-            document.getElementById('save-profile').addEventListener('click', saveProfile);
-            
-            document.getElementById('close-privacy-modal').addEventListener('click', () => hideModal('privacy-modal'));
-            document.getElementById('save-privacy').addEventListener('click', savePrivacySettings);
-            
-            document.getElementById('close-logout-modal').addEventListener('click', () => hideModal('logout-modal'));
-            document.getElementById('cancel-logout').addEventListener('click', () => hideModal('logout-modal'));
-            document.getElementById('confirm-logout').addEventListener('click', logout);
             
             // رویدادهای فرم‌های ایجاد
             document.getElementById('cancel-new-chat').addEventListener('click', showChatsList);
