@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -480,6 +477,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
         }
 
         .chat-status {
@@ -1038,6 +1036,170 @@
         .mention:hover {
             text-decoration: underline;
         }
+
+        /* منوی پیام */
+        .message-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            z-index: 50;
+            width: 150px;
+        }
+
+        .message-menu-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .message-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-menu-item:active {
+            background: var(--border-color);
+        }
+
+        .message-menu-icon {
+            font-size: 16px;
+            color: var(--text-secondary);
+            width: 18px;
+            text-align: center;
+        }
+
+        .message-menu-text {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* آیکون منوی پیام */
+        .message-actions {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        /* صفحه پروفایل */
+        .profile-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header {
+            background: var(--secondary-color);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 60px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            margin-left: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .profile-content {
+            padding: 16px;
+            flex: 1;
+        }
+
+        .profile-section {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .profile-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-width: 120px;
+        }
+
+        .profile-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .profile-bio {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -1202,6 +1364,61 @@
                     <button class="send-button" id="send-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
+                </div>
+            </div>
+
+            <!-- صفحه پروفایل -->
+            <div class="profile-container hidden" id="profile-container">
+                <div class="profile-header">
+                    <button class="header-btn" id="back-from-profile-btn">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="profile-avatar avatar-user" id="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profile-name">
+                            نام کاربر
+                            <i class="fas fa-check-circle verified-badge" id="profile-verified-badge"></i>
+                        </div>
+                        <div class="profile-status" id="profile-status">آنلاین</div>
+                    </div>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-section">
+                        <div class="profile-item">
+                            <div class="profile-label">آخرین بازدید</div>
+                            <div class="profile-value" id="profile-last-seen">به تازگی</div>
+                        </div>
+                        <div class="profile-item">
+                            <div class="profile-label">شماره</div>
+                            <div class="profile-value" id="profile-number">68995-63/5/53</div>
+                        </div>
+                        <div class="profile-item">
+                            <div class="profile-label">نام کاربری</div>
+                            <div class="profile-value" id="profile-username">MMDhosein_FreeFire_Player</div>
+                        </div>
+                        <div class="profile-bio" id="profile-bio">
+                            حرف های پشت سرم حرف نیست عقده است......
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <div class="profile-item">
+                            <div class="profile-label">اعلان ها</div>
+                            <div class="profile-value">فعال</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <div class="profile-item" id="send-message-profile">
+                            <div class="profile-label">ارسال پیام</div>
+                            <div class="profile-value">
+                                <i class="fas fa-chevron-left"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1485,6 +1702,7 @@
             newChatContainer: document.getElementById('new-chat-container'),
             createGroupContainer: document.getElementById('create-group-container'),
             createChannelContainer: document.getElementById('create-channel-container'),
+            profileContainer: document.getElementById('profile-container'),
             mainContent: document.getElementById('main-content'),
             menuDropdown: document.getElementById('menu-dropdown'),
             messageInput: document.getElementById('message-input'),
@@ -1566,6 +1784,7 @@
             
             // رویدادهای دیگر
             document.getElementById('back-btn').addEventListener('click', showChatsList);
+            document.getElementById('back-from-profile-btn').addEventListener('click', showChatsList);
             document.getElementById('send-btn').addEventListener('click', sendMessage);
             document.getElementById('message-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -1626,6 +1845,13 @@
             document.getElementById('camera-btn').addEventListener('click', () => showMessage('امکانات دوربین به زودی اضافه خواهد شد'));
             document.getElementById('mic-btn').addEventListener('click', () => showMessage('امکانات ضبط صدا به زودی اضافه خواهد شد'));
             
+            // رویداد نمایش پروفایل
+            document.getElementById('chat-with').addEventListener('click', showProfile);
+            document.getElementById('send-message-profile').addEventListener('click', () => {
+                elements.profileContainer.classList.add('hidden');
+                elements.chatContainer.classList.remove('hidden');
+            });
+            
             // تنظیم ارتفاع خودکار برای فیلد ورودی پیام
             setupAutoResizeTextarea();
             
@@ -1633,6 +1859,13 @@
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.header-btn') && !e.target.closest('.menu-dropdown')) {
                     elements.menuDropdown.classList.add('hidden');
+                }
+                
+                // بستن منوی پیام با کلیک خارج از آن
+                if (!e.target.closest('.message-actions') && !e.target.closest('.message-menu')) {
+                    document.querySelectorAll('.message-menu').forEach(menu => {
+                        menu.remove();
+                    });
                 }
             });
             
@@ -1670,14 +1903,15 @@
                 users = [
                     {
                         id: 1,
-                        username: 'مدیر سعدی',
-                        userid: '@admin',
+                        username: 'محمد حسین',
+                        userid: '@MMDhosein',
                         password: '123456',
                         online: true,
                         verified: true,
                         type: 'user',
-                        bio: 'مدیر پیامرسان سعدی',
-                        lastSeen: new Date().toISOString()
+                        bio: 'حرف های پشت سرم حرف نیست عقده است......',
+                        lastSeen: new Date().toISOString(),
+                        number: '68995-63/5/53'
                     },
                     {
                         id: 2,
@@ -1688,7 +1922,8 @@
                         verified: false,
                         type: 'user',
                         bio: 'کاربر نمونه پیامرسان سعدی',
-                        lastSeen: new Date().toISOString()
+                        lastSeen: new Date().toISOString(),
+                        number: '12345-67/8/90'
                     },
                     {
                         id: 3,
@@ -1699,7 +1934,8 @@
                         verified: true,
                         type: 'user',
                         bio: 'تیم پشتیبانی پیامرسان سعدی',
-                        lastSeen: new Date().toISOString()
+                        lastSeen: new Date().toISOString(),
+                        number: '021-12345678'
                     }
                 ];
                 storage.set(STORAGE_KEYS.USERS, users);
@@ -1889,7 +2125,8 @@
                 verified: false,
                 type: 'user',
                 bio: 'کاربر جدید پیامرسان سعدی',
-                lastSeen: new Date().toISOString()
+                lastSeen: new Date().toISOString(),
+                number: 'جدید'
             };
             
             // ذخیره کاربر
@@ -1921,6 +2158,7 @@
             elements.newChatContainer.classList.add('hidden');
             elements.createGroupContainer.classList.add('hidden');
             elements.createChannelContainer.classList.add('hidden');
+            elements.profileContainer.classList.add('hidden');
             
             // نمایش بخش انتخاب شده
             switch(tabName) {
@@ -2046,6 +2284,7 @@
             
             elements.chatsList.classList.add('hidden');
             elements.chatContainer.classList.remove('hidden');
+            elements.profileContainer.classList.add('hidden');
             loadMessages(chat.id);
             
             // پاک کردن اعلان‌های خوانده شده
@@ -2120,18 +2359,127 @@
                 let statusIcon = '';
                 if (message.sender === currentUser.userid) {
                     statusIcon = '<span class="message-status"><i class="fas fa-check-double"></i></span>';
+                    
+                    // اضافه کردن منوی عملیات برای پیام‌های ارسالی
+                    messageElement.innerHTML = `
+                        <div class="message-actions">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </div>
+                        <div class="message-text">${message.text}</div>
+                        <div class="message-time">${formatTime(message.timestamp)}</div>
+                        ${statusIcon}
+                    `;
+                    
+                    // اضافه کردن رویداد برای منوی عملیات
+                    const messageActions = messageElement.querySelector('.message-actions');
+                    messageActions.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showMessageMenu(e.target, message);
+                    });
+                } else {
+                    messageElement.innerHTML = `
+                        <div class="message-text">${message.text}</div>
+                        <div class="message-time">${formatTime(message.timestamp)}</div>
+                        ${statusIcon}
+                    `;
                 }
                 
-                messageElement.innerHTML = `
-                    <div class="message-text">${message.text}</div>
-                    <div class="message-time">${formatTime(message.timestamp)}</div>
-                    ${statusIcon}
-                `;
                 elements.messagesContainer.appendChild(messageElement);
             });
             
             // اسکرول به پایین
             elements.messagesContainer.scrollTop = elements.messagesContainer.scrollHeight;
+        }
+
+        // نمایش منوی پیام
+        function showMessageMenu(target, message) {
+            // حذف منوهای قبلی
+            document.querySelectorAll('.message-menu').forEach(menu => {
+                menu.remove();
+            });
+            
+            const menu = document.createElement('div');
+            menu.className = 'message-menu';
+            
+            // محاسبه موقعیت منو
+            const rect = target.getBoundingClientRect();
+            menu.style.top = `${rect.top + window.scrollY}px`;
+            menu.style.left = `${rect.left + window.scrollX - 160}px`;
+            
+            menu.innerHTML = `
+                <div class="message-menu-item" id="edit-message-${message.id}">
+                    <div class="message-menu-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="message-menu-text">ویرایش پیام</div>
+                </div>
+                <div class="message-menu-item" id="delete-message-${message.id}">
+                    <div class="message-menu-icon">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                    <div class="message-menu-text">حذف پیام</div>
+                </div>
+            `;
+            
+            document.body.appendChild(menu);
+            
+            // اضافه کردن رویدادها
+            document.getElementById(`edit-message-${message.id}`).addEventListener('click', () => {
+                editMessage(message);
+                menu.remove();
+            });
+            
+            document.getElementById(`delete-message-${message.id}`).addEventListener('click', () => {
+                deleteMessage(message);
+                menu.remove();
+            });
+        }
+
+        // ویرایش پیام
+        function editMessage(message) {
+            const newText = prompt('ویرایش پیام:', message.text);
+            if (newText && newText.trim() !== '') {
+                // پیدا کردن پیام در آرایه
+                const chatMessages = messages[message.chatId];
+                const messageIndex = chatMessages.findIndex(m => m.id === message.id);
+                
+                if (messageIndex !== -1) {
+                    // به‌روزرسانی پیام
+                    chatMessages[messageIndex].text = newText.trim();
+                    chatMessages[messageIndex].edited = true;
+                    chatMessages[messageIndex].editTimestamp = new Date().toISOString();
+                    
+                    // ذخیره تغییرات
+                    storage.set(STORAGE_KEYS.MESSAGES, messages);
+                    
+                    // بارگذاری مجدد پیام‌ها
+                    loadMessages(message.chatId);
+                    
+                    showMessage('پیام ویرایش شد', 'success');
+                }
+            }
+        }
+
+        // حذف پیام
+        function deleteMessage(message) {
+            if (confirm('آیا از حذف این پیام مطمئن هستید؟')) {
+                // پیدا کردن پیام در آرایه
+                const chatMessages = messages[message.chatId];
+                const messageIndex = chatMessages.findIndex(m => m.id === message.id);
+                
+                if (messageIndex !== -1) {
+                    // حذف پیام
+                    chatMessages.splice(messageIndex, 1);
+                    
+                    // ذخیره تغییرات
+                    storage.set(STORAGE_KEYS.MESSAGES, messages);
+                    
+                    // بارگذاری مجدد پیام‌ها
+                    loadMessages(message.chatId);
+                    
+                    showMessage('پیام حذف شد', 'success');
+                }
+            }
         }
 
         // ارسال پیام
@@ -2173,10 +2521,21 @@
             messageElement.className = 'message message-sent';
             
             messageElement.innerHTML = `
+                <div class="message-actions">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
                 <div class="message-text">${text}</div>
                 <div class="message-time">${formatTime(newMessage.timestamp)}</div>
                 <span class="message-status"><i class="fas fa-check-double"></i></span>
             `;
+            
+            // اضافه کردن رویداد برای منوی عملیات
+            const messageActions = messageElement.querySelector('.message-actions');
+            messageActions.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showMessageMenu(e.target, newMessage);
+            });
+            
             elements.messagesContainer.appendChild(messageElement);
             
             // پاک کردن فیلد ورودی
@@ -2317,6 +2676,7 @@
             elements.newChatContainer.classList.add('hidden');
             elements.createGroupContainer.classList.add('hidden');
             elements.createChannelContainer.classList.add('hidden');
+            elements.profileContainer.classList.add('hidden');
             elements.chatsList.classList.remove('hidden');
             currentChat = null;
         }
@@ -2343,6 +2703,63 @@
             elements.chatsList.classList.add('hidden');
             elements.createChannelContainer.classList.remove('hidden');
             document.getElementById('header-title').textContent = 'ایجاد کانال';
+        }
+
+        // نمایش پروفایل
+        function showProfile() {
+            if (!currentChat) return;
+            
+            // پیدا کردن کاربر مربوطه
+            let profileUser = null;
+            if (currentChat.type === 'user') {
+                const otherUserId = currentChat.participants.find(id => id !== currentUser.userid);
+                profileUser = users.find(u => u.userid === otherUserId);
+            } else if (currentChat.type === 'group') {
+                const group = groups.find(g => g.id === currentChat.id);
+                if (group) {
+                    profileUser = {
+                        username: group.name,
+                        userid: group.id,
+                        bio: group.bio,
+                        online: true,
+                        verified: false,
+                        number: 'گروه'
+                    };
+                }
+            } else if (currentChat.type === 'channel') {
+                const channel = channels.find(c => c.id === currentChat.id);
+                if (channel) {
+                    profileUser = {
+                        username: channel.name,
+                        userid: channel.id,
+                        bio: channel.bio,
+                        online: true,
+                        verified: false,
+                        number: 'کانال'
+                    };
+                }
+            }
+            
+            if (!profileUser) return;
+            
+            // پر کردن اطلاعات پروفایل
+            document.getElementById('profile-name').innerHTML = `
+                ${profileUser.username}
+                ${profileUser.verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+            `;
+            document.getElementById('profile-status').textContent = profileUser.online ? 'آنلاین' : 'آفلاین';
+            document.getElementById('profile-last-seen').textContent = 'به تازگی';
+            document.getElementById('profile-number').textContent = profileUser.number;
+            document.getElementById('profile-username').textContent = profileUser.userid;
+            document.getElementById('profile-bio').textContent = profileUser.bio;
+            
+            // تنظیم آواتار
+            const profileAvatar = document.getElementById('profile-avatar');
+            profileAvatar.className = `profile-avatar ${currentChat.type === 'group' ? 'avatar-group' : currentChat.type === 'channel' ? 'avatar-channel' : 'avatar-user'}`;
+            profileAvatar.innerHTML = `<i class="${currentChat.type === 'group' ? 'fas fa-users' : currentChat.type === 'channel' ? 'fas fa-bullhorn' : 'fas fa-user'}"></i>`;
+            
+            elements.chatContainer.classList.add('hidden');
+            elements.profileContainer.classList.remove('hidden');
         }
 
         // شروع چت جدید
@@ -2660,28 +3077,12 @@
             }
         }
         
-        // فرمت زمان
+        // فرمت زمان (ساعت:دقیقه)
         function formatTime(timestamp) {
             const date = new Date(timestamp);
-            const now = new Date();
-            const diffTime = Math.abs(now - date);
-            const diffMinutes = Math.floor(diffTime / (1000 * 60));
-            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffMinutes < 1) {
-                return 'اکنون';
-            } else if (diffMinutes < 60) {
-                return `${diffMinutes} دقیقه قبل`;
-            } else if (diffHours < 24) {
-                return `${diffHours} ساعت قبل`;
-            } else if (diffDays === 1) {
-                return 'دیروز';
-            } else if (diffDays < 7) {
-                return `${diffDays} روز قبل`;
-            } else {
-                return date.toLocaleDateString('fa-IR');
-            }
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
         }
         
         // نمایش/پنهان کردن منو
